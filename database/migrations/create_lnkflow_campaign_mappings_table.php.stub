@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('lnkflow_campaign_mappings', function (Blueprint $table): void {
+            $table->id();
+            $table->string('connection');
+            $table->string('remote_team_id');
+            $table->string('campaign_key');
+            $table->unsignedBigInteger('remote_campaign_id')->nullable();
+            $table->uuid('idempotency_key');
+            $table->string('payload_hash', 64)->nullable();
+            $table->string('state', 16)->default('pending');
+            $table->string('last_error_code')->nullable();
+            $table->string('last_request_id', 64)->nullable();
+            $table->string('last_error_message', 500)->nullable();
+            $table->timestamp('last_synced_at')->nullable();
+            $table->timestamps();
+            $table->unique(['connection', 'remote_team_id', 'campaign_key'], 'lnkflow_campaign_mapping_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('lnkflow_campaign_mappings');
+    }
+};

@@ -1,0 +1,69 @@
+name: Compatibility tests
+
+on:
+  push:
+    branches: [main, '*.x']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            laravel: '12.*'
+            testbench: '10.*'
+            stability: prefer-lowest
+          - php: '8.3'
+            laravel: '12.*'
+            testbench: '10.*'
+            stability: prefer-stable
+          - php: '8.4'
+            laravel: '12.*'
+            testbench: '10.*'
+            stability: prefer-stable
+          - php: '8.3'
+            laravel: '13.*'
+            testbench: '11.*'
+            stability: prefer-stable
+          - php: '8.4'
+            laravel: '13.*'
+            testbench: '11.*'
+            stability: prefer-stable
+          - php: '8.5'
+            laravel: '13.*'
+            testbench: '11.*'
+            stability: prefer-stable
+
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }} / ${{ matrix.stability }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, sqlite, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+
+      - name: Resolve compatibility set
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --no-scripts
+          composer run prepare
+
+      - run: composer validate --strict
+      - run: composer lint:check
+      - run: composer analyse
+      - run: composer test:unit
+      - run: composer audit
