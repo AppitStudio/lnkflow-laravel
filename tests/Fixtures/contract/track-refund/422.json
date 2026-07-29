@@ -17,6 +17,7 @@
     },
     "body": {
         "message": "No sale with this invoice_id exists for this team.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "original_invoice_id": [
                 "No sale with this invoice_id exists for this team."

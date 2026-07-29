@@ -208,19 +208,23 @@ one fixture per error class, asserting the exception **type**, `status`, `errors
 
 ## Contract notes surfaced by the corpus
 
-Reading the recorded bodies side by side makes two inconsistencies obvious. Both
-are described here rather than silently smoothed over in the fixtures:
+Reading the recorded bodies side by side is what surfaced two inconsistencies
+that have since been fixed. Both are worth knowing, because the *shape* of the
+fix is the contract:
 
-1. **Only the idempotency middleware emits a machine-readable `code`.**
-   `409`/`422` from `EnsureIdempotentApiRequest` carry
-   `{"message": …, "code": "IDEMPOTENCY_IN_PROGRESS" | "IDEMPOTENCY_KEY_REUSED" |
-   "INVALID_IDEMPOTENCY_KEY"}`. Every other error — `401`, `403`, `404`, ordinary
-   `422`, `429` — carries `message` (plus `errors` for validation) and no `code`.
-   Clients therefore cannot switch on a stable symbol outside idempotency.
-2. **`404` leaks the internal model class.** Cross-tenant reads return
-   `"No query results for model [App\\Models\\Campaign] 2"`. That is the correct
-   *status* (a tenancy boundary must be indistinguishable from a missing row), but
-   the message exposes internals and must never be parsed or shown to end users.
+1. **Every error carries a machine-readable `code`.** It used to be only the
+   idempotency middleware; `401`, `403`, `404`, ordinary `422` and `429` carried
+   prose and nothing else, so a client had to string-match English to tell a
+   read-only *token* from a read-only *role*. `App\Exceptions\Api\ApiErrorCode`
+   is now the single source of those symbols and
+   `App\Exceptions\Api\ApiExceptionRenderer` puts one on every `/api/*` failure.
+   Assert on `code`; never assert on `message`, which is prose and gets reworded.
+2. **`404` no longer names the model class.** Cross-tenant reads used to return
+   `"No query results for model [App\\Models\\Campaign] 2"` — the right *status*
+   (a tenancy boundary must be indistinguishable from a missing row) with a body
+   that gave the boundary away. It is now `"Resource not found."` with
+   `code=NOT_FOUND`, byte-identical to a genuinely missing id. The corpus has
+   both cases; they should stay identical.
 
 ## Related documents
 

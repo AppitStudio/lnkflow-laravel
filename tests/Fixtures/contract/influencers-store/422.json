@@ -15,6 +15,7 @@
     },
     "body": {
         "message": "The name field is required.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "name": [
                 "The name field is required."

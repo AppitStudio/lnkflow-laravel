@@ -14,19 +14,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LnkFlow\Laravel\Contracts\Transport;
 use LnkFlow\Laravel\Exceptions\ConnectionException;
+use LnkFlow\Laravel\Exceptions\ErrorCode;
 use LnkFlow\Laravel\Support\Shape;
 use Throwable;
 
 final class ApiTransport implements Transport
 {
     public const VERSION = '0.1.0-dev';
-
-    /**
-     * The server-side error code for a concurrent duplicate of an in-flight
-     * idempotent create. It is the one 4xx a client should retry: the first
-     * request is still running and will produce the authoritative response.
-     */
-    private const IDEMPOTENCY_IN_PROGRESS = 'IDEMPOTENCY_IN_PROGRESS';
 
     /** @param array<string, mixed> $config */
     public function __construct(
@@ -271,7 +265,8 @@ final class ApiTransport implements Transport
         $json = $response->json();
         $code = is_array($json) ? ($json['code'] ?? null) : null;
 
-        return is_string($code) && mb_strtoupper($code) === self::IDEMPOTENCY_IN_PROGRESS;
+        return is_string($code)
+            && mb_strtoupper($code) === ErrorCode::IdempotencyInProgress->value;
     }
 
     /**

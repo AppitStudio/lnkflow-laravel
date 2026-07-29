@@ -17,6 +17,7 @@
     },
     "body": {
         "message": "Storage consent must be explicitly granted.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "consent.storage": [
                 "Storage consent must be explicitly granted."

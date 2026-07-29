@@ -15,6 +15,7 @@
     },
     "body": {
         "message": "The from field must match the format Y-m-d. (and 1 more error)",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "from": [
                 "The from field must match the format Y-m-d."

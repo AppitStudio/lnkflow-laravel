@@ -15,6 +15,7 @@
     },
     "body": {
         "message": "The q field is required.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "q": [
                 "The q field is required."

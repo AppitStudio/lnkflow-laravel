@@ -30,6 +30,7 @@ use LnkFlow\Laravel\Data\Workspace;
 use LnkFlow\Laravel\Exceptions\AuthenticationException;
 use LnkFlow\Laravel\Exceptions\AuthorizationException;
 use LnkFlow\Laravel\Exceptions\ConflictException;
+use LnkFlow\Laravel\Exceptions\ErrorCode;
 use LnkFlow\Laravel\Exceptions\LnkFlowException;
 use LnkFlow\Laravel\Exceptions\NotFoundException;
 use LnkFlow\Laravel\Exceptions\RateLimitException;
@@ -325,9 +326,15 @@ it('maps the error envelope of every status the SDK understands', function (stri
         $call(app(Client::class));
         test()->fail("Expected {$exception} for fixture [{$fixture}].");
     } catch (LnkFlowException $thrown) {
+        // The code is the branchable part of the contract, so it is asserted
+        // from the recorded bytes rather than hard-coded here: a server that
+        // stops sending one fails this instead of quietly degrading every
+        // consumer to message-matching.
         expect($thrown)->toBeInstanceOf($exception)
             ->and($thrown->status)->toBe(Fixture::status($fixture))
             ->and($thrown->getMessage())->toBe(Fixture::body($fixture)['message'])
+            ->and($thrown->errorCode)->toBe(Fixture::body($fixture)['code'])
+            ->and($thrown->code())->toBeInstanceOf(ErrorCode::class)
             ->and($thrown->requestId)->toBe('00000000-0000-4000-8000-000000000000');
     }
 })->with([
@@ -359,8 +366,71 @@ it('exposes validation errors field by field', function (): void {
         expect($exception->errors)->toBe([
             'slug' => ['The slug field format is invalid.'],
             'destination_url' => ['The destination url field must be a valid URL.'],
-        ])->and($exception->errorCode)->toBeNull();
+        ])->and($exception->code())->toBe(ErrorCode::ValidationFailed);
     }
+});
+
+/**
+ * Two 403s that need different fixes: one wants a new token, the other wants a
+ * role change. They were indistinguishable while `code` was absent, which is
+ * exactly why an integration had to match on English prose.
+ */
+it('tells a read-only token apart from an unreachable team', function (): void {
+    contractFake('websites-store/403');
+
+    try {
+        app(Client::class)->websites()->create(new CreateWebsite('Docs'));
+        test()->fail('Expected an authorization exception.');
+    } catch (AuthorizationException $exception) {
+        expect($exception->code())->toBe(ErrorCode::TokenMissingAbility)
+            ->and($exception->is(ErrorCode::TokenMissingAbility))->toBeTrue()
+            ->and($exception->is(ErrorCode::TeamInaccessible))->toBeFalse()
+            ->and($exception->code()?->requiresUserAction())->toBeTrue();
+    }
+
+    contractFake('me/403');
+
+    try {
+        app(Client::class)->identity()->me();
+        test()->fail('Expected an authorization exception.');
+    } catch (AuthorizationException $exception) {
+        expect($exception->code())->toBe(ErrorCode::TeamInaccessible);
+    }
+});
+
+/**
+ * The server's code set grows additively. A release of this package that
+ * predates a new code must keep working: the raw string stays reachable and
+ * the exception type — derived from the status — still classifies it.
+ */
+it('tolerates an error code this release does not know', function (): void {
+    Http::fake(['*' => Http::response(
+        ['message' => 'Something new happened.', 'code' => 'SOME_FUTURE_CODE'],
+        403,
+        ['X-LnkFlow-Request-Id' => 'req_future'],
+    )]);
+
+    try {
+        app(Client::class)->identity()->me();
+        test()->fail('Expected an authorization exception.');
+    } catch (AuthorizationException $exception) {
+        expect($exception->errorCode)->toBe('SOME_FUTURE_CODE')
+            ->and($exception->code())->toBeNull()
+            ->and($exception->is(ErrorCode::Forbidden))->toBeFalse();
+    }
+});
+
+/**
+ * A cross-team resource has to be byte-identical to a missing one, or the 404
+ * body becomes a way to enumerate other teams' ids. It also must not name the
+ * model class, which it used to.
+ */
+it('cannot distinguish a foreign resource from a missing one', function (): void {
+    $body = Fixture::body('campaigns-show/404');
+
+    expect($body['message'])->toBe('Resource not found.')
+        ->and($body['code'])->toBe(ErrorCode::NotFound->value)
+        ->and(json_encode($body))->not->toContain('App\\Models\\');
 });
 
 it('surfaces the server error code on a rate limit alongside Retry-After', function (): void {

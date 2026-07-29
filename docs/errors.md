@@ -29,7 +29,9 @@ All are public readonly.
 |---|---|---|---|
 | `->status` | `?int` | all | the HTTP status, or `null` for `ConnectionException` |
 | `->requestId` | `?string` | all | the server's `X-LnkFlow-Request-Id`. On a `ConnectionException` from a failed or exhausted request it is the client-generated id for that attempt chain; on the configuration failures (no token, unknown connection) it is `null`, because nothing was sent. Quote it in support requests |
-| `->errorCode` | `?string` | all | the response body's `code`, e.g. `IDEMPOTENCY_IN_PROGRESS`, `IDEMPOTENCY_KEY_REUSED`. `null` when the server sent none |
+| `->errorCode` | `?string` | all | the response body's raw `code`. `null` only on `ConnectionException`, where nothing came back |
+| `->code()` | `?ErrorCode` | all | the same code, typed. `null` when the string is one this release predates — see below |
+| `->is(ErrorCode ...$codes)` | `bool` | all | whether the failure is one of the given codes |
 | `->errors` | `array<string, list<string>>` | all | the validation bag, normalized to field ⇒ list of messages. Empty when the server sent none |
 | `->retryAfter` | `?int` | `RateLimitException` **only** | seconds, parsed from `Retry-After` (numeric or HTTP-date) |
 | `getMessage()` | `string` | all | the server's `message`, or `'The LnkFlow API request failed.'` |
@@ -51,18 +53,67 @@ try {
 The message and the field bag come from the server. Do not log the raw request
 body, the bearer token, or customer identifiers alongside them.
 
-## What each status usually means
+## Branch on the code, not the message
 
-| Status | Usual cause | What to do |
+Every LnkFlow API failure carries a machine-readable `code`. The exception class
+tells you the status class; the code tells you which of several failures with
+that status you have — and those need different fixes.
+
+```php
+use LnkFlow\Laravel\Exceptions\AuthorizationException;
+use LnkFlow\Laravel\Exceptions\ErrorCode;
+
+try {
+    $client->links()->create($campaignId, $payload, $key);
+} catch (AuthorizationException $e) {
+    match (true) {
+        $e->is(ErrorCode::TokenMissingAbility) => $this->promptForWriteToken(),
+        $e->is(ErrorCode::TeamRoleReadOnly)    => $this->explainRole(),
+        $e->is(ErrorCode::TeamInaccessible)    => $this->reselectTeam(),
+        default                                => throw $e,
+    };
+}
+```
+
+`getMessage()` is English prose written for a human reader. It is reworded and
+localized, and matching on it is how three integrations ended up with three
+different ideas of what a 403 meant. Do not do it.
+
+| `code` | Status | Usual cause |
 |---|---|---|
-| 401 | token invalid, revoked, or expired | rotate it; never log the value |
-| 403 | token lacks the ability, or no access to the selected team | check [Token scopes](token-scopes.md); remember `links()->preview()` needs `write` |
-| 404 | the resource does not exist, or belongs to another team | do not "fix" this by widening tenant scope — it is a security boundary |
-| 409 | `IDEMPOTENCY_IN_PROGRESS` (a concurrent duplicate is still running) or a genuine conflict | the SDK retries only the former, automatically |
-| 422 | validation failure, or `IDEMPOTENCY_KEY_REUSED` (same key, different payload) | read `->errors`; for key reuse, fix the key, not the payload |
-| 429 | rate limited | honour `->retryAfter` |
-| 5xx | server failure | retry with the same idempotency key |
-| — | `ConnectionException` | timeout, DNS, TLS, no token configured, or unknown connection name |
+| `UNAUTHENTICATED` | 401 | token invalid, revoked, or expired |
+| `TOKEN_MISSING_ABILITY` | 403 | the token lacks `write` / `conversions` — see [Token scopes](token-scopes.md) |
+| `TEAM_ROLE_READ_ONLY` | 403 | the token is fine; the caller's role on the team is not |
+| `TEAM_INACCESSIBLE` | 403 | the configured team id is not reachable by this token |
+| `FORBIDDEN` | 403 | any other authorization failure |
+| `BAD_REQUEST` | 400 | malformed request that field validation did not describe |
+| `NOT_FOUND` | 404 | missing, **or** owned by another team — deliberately identical |
+| `METHOD_NOT_ALLOWED` | 405 | wrong verb |
+| `CONFLICT` | 409 | a genuine resource conflict |
+| `VALIDATION_FAILED` | 422 | read `->errors` |
+| `PAYLOAD_TOO_LARGE` | 413 | send less |
+| `RATE_LIMITED` | 429 | honour `->retryAfter` |
+| `SERVER_ERROR` | 5xx | retry with the same idempotency key |
+| `SERVICE_UNAVAILABLE` | 503 | retry with backoff |
+| `IDEMPOTENCY_IN_PROGRESS` | 409 | a concurrent duplicate is still running — the SDK retries this one automatically |
+| `IDEMPOTENCY_KEY_REUSED` | 422 | same key, different payload — fix the key, not the payload |
+| `INVALID_IDEMPOTENCY_KEY` | 422 | malformed header |
+
+`ErrorCode::transient()` and `ErrorCode::requiresUserAction()` classify these if
+you would rather not enumerate them yourself.
+
+A `404` never distinguishes "missing" from "another team's" — that is a security
+boundary, not a rough edge. Do not "fix" it by widening tenant scope.
+
+### Forward compatibility
+
+The server's code set grows additively. When it sends one this package release
+predates, `->code()` returns `null` and `->errorCode` keeps the raw string; the
+exception class, derived from the status, still classifies the failure. So the
+safe shape is: branch on the codes you know, and fall through to the exception
+type.
+
+`ConnectionException` has no code at all — nothing came back.
 
 ## Retry policy
 

@@ -27,6 +27,13 @@ they are called out because working code exists against the earlier shapes.
 - **`Http\ApiResponse`** — a first-class successful response with `status`,
   `body`, retained `headers`, raw `contents`, and `data()`, `collection()`,
   `meta()`, `links()`, `header()`, `requestId()`, `replayed()`.
+- **`Exceptions\ErrorCode`** — the API's machine-readable `code` as a backed
+  enum, plus `LnkFlowException::code()` and `::is(ErrorCode ...)`. Branch on
+  these instead of on `getMessage()`: a 403 for a read-only *token* and a 403
+  for a read-only *role* need different fixes and were previously
+  indistinguishable without matching English prose. An unrecognised code from a
+  newer server yields `null` from `code()` while `errorCode` keeps the raw
+  string, so an older SDK release keeps working.
 - **New read models**: `Website`, `Influencer`, `Domain`, `Commission`,
   `ConversionEvent`, `ConversionStats` (with `hasConversionData`), `SearchMatch`,
   and `Workspace`. `Link` and `Campaign` are now fully typed rather than raw

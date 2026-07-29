@@ -15,6 +15,7 @@
     },
     "body": {
         "message": "The selected type is invalid.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "type": [
                 "The selected type is invalid."

@@ -15,6 +15,7 @@
     },
     "body": {
         "message": "The campaign id field is required when campaign name is not present. (and 2 more errors)",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "campaign_id": [
                 "The campaign id field is required when campaign name is not present."

@@ -15,6 +15,7 @@
     },
     "body": {
         "message": "The name has already been taken.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "name": [
                 "The name has already been taken."
