@@ -1,0 +1,27 @@
+{
+    "endpoint": "stats-summary",
+    "case": "Malformed date and unsupported grouping.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/stats/summary",
+        "query": "from=15-01-2026&group_by=hour",
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "The from field must match the format Y-m-d. (and 1 more error)",
+        "errors": {
+            "from": [
+                "The from field must match the format Y-m-d."
+            ],
+            "group_by": [
+                "The selected group by is invalid."
+            ]
+        }
+    }
+}

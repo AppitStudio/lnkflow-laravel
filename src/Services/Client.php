@@ -50,6 +50,16 @@ class Client
         return new InfluencersClient($this->transport->forPurpose('links'));
     }
 
+    public function search(): SearchClient
+    {
+        return new SearchClient($this->transport);
+    }
+
+    public function workspace(): WorkspaceClient
+    {
+        return new WorkspaceClient($this->transport);
+    }
+
     public function stats(): StatsClient
     {
         return new StatsClient($this->transport);

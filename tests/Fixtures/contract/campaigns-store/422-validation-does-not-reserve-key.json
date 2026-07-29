@@ -1,0 +1,26 @@
+{
+    "endpoint": "campaigns-store",
+    "case": "Unused key, kept so the corpus documents the header name.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/campaigns",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "20",
+        "x-ratelimit-remaining": "10"
+    },
+    "body": {
+        "message": "The slug field format is invalid.",
+        "errors": {
+            "slug": [
+                "The slug field format is invalid."
+            ]
+        }
+    }
+}

@@ -5,15 +5,34 @@ declare(strict_types=1);
 namespace LnkFlow\Laravel\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use LnkFlow\Laravel\LnkFlowServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
+    /**
+     * The suite is offline, always.
+     *
+     * This is the transport guard the integration release gate requires: any
+     * request that is not explicitly faked raises StrayRequestException and
+     * fails the test, so a new code path can never quietly start talking to a
+     * real LnkFlow host from CI or from a developer's machine.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Http::preventStrayRequests();
+    }
+
     protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set('database.default', 'testing');
+        // Deterministic and table-free: unique-job locks and the client-side
+        // throttle both need a working cache store.
+        $app['config']->set('cache.default', 'array');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -42,6 +61,19 @@ abstract class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
+        // The real framework `jobs` table, so queue-serialization tests can
+        // assert on the payload the queue actually stores rather than on a
+        // reimplementation of it.
+        Schema::create('jobs', function (Blueprint $table): void {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
         Schema::create('test_contents', function (Blueprint $table): void {
             $table->id();
             $table->string('title');

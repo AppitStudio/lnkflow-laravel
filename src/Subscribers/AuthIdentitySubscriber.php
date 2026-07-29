@@ -39,7 +39,7 @@ final readonly class AuthIdentitySubscriber
             $visitorId,
             $this->customers->resolve($event->user),
             $this->websiteId(),
-        )->onQueue(config('lnkflow.journeys.queue'))->afterCommit();
+        )->onQueue($this->queue())->afterCommit();
     }
 
     public function logout(Logout $event): void
@@ -51,14 +51,22 @@ final readonly class AuthIdentitySubscriber
         }
 
         UnidentifyVisitorJob::dispatch($visitorId, $this->websiteId())
-            ->onQueue(config('lnkflow.journeys.queue'))
+            ->onQueue($this->queue())
             ->afterCommit();
     }
 
     private function websiteId(): ?int
     {
-        $value = config('lnkflow.connections.'.config('lnkflow.default').'.website');
+        $value = config('lnkflow.connections.'.config()->string('lnkflow.default', 'default').'.website');
 
         return is_numeric($value) ? (int) $value : null;
+    }
+
+    /** The configured journeys queue, or null for the default queue. */
+    private function queue(): ?string
+    {
+        $queue = config('lnkflow.journeys.queue');
+
+        return is_string($queue) ? $queue : null;
     }
 }

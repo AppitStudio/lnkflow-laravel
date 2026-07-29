@@ -4,40 +4,34 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Services;
 
+use LnkFlow\Laravel\Data\CreateWebsite;
 use LnkFlow\Laravel\Data\Page;
-use LnkFlow\Laravel\Data\Resource;
+use LnkFlow\Laravel\Data\UpdateWebsite;
+use LnkFlow\Laravel\Data\Website;
 
 final class WebsitesClient extends AbstractClient
 {
     /**
      * @param  array<string, scalar|null>  $filters
-     * @return Page<resource>
+     * @return Page<Website>
      */
     public function list(array $filters = []): Page
     {
-        $payload = $this->transport->send('GET', 'websites', $filters);
-
-        return new Page(
-            array_map(fn (array $item): Resource => new Resource($item), $this->collection($payload)),
-            is_array($payload['meta'] ?? null) ? $payload['meta'] : [],
-            is_array($payload['links'] ?? null) ? $payload['links'] : [],
-        );
+        return $this->paginate('websites', $filters, static fn (array $item): Website => new Website($item));
     }
 
-    public function get(int $id): Resource
+    public function get(int $id): Website
     {
-        return new Resource($this->data($this->transport->send('GET', "websites/{$id}")));
+        return new Website($this->transport->send('GET', "websites/{$id}")->data());
     }
 
-    /** @param array<string, mixed> $attributes */
-    public function create(array $attributes): Resource
+    public function create(CreateWebsite $request): Website
     {
-        return new Resource($this->data($this->transport->send('POST', 'websites', json: $attributes)));
+        return new Website($this->transport->send('POST', 'websites', json: $request->toArray())->data());
     }
 
-    /** @param array<string, mixed> $attributes */
-    public function update(int $id, array $attributes): Resource
+    public function update(int $id, UpdateWebsite $request): Website
     {
-        return new Resource($this->data($this->transport->send('PATCH', "websites/{$id}", json: $attributes)));
+        return new Website($this->transport->send('PATCH', "websites/{$id}", json: $request->toArray())->data());
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LnkFlow\Laravel\Services;
 
 use LnkFlow\Laravel\Contracts\Payload;
+use LnkFlow\Laravel\Data\EnrichedPayload;
 use LnkFlow\Laravel\Data\Lead;
 use LnkFlow\Laravel\Data\NamedEvent;
 use LnkFlow\Laravel\Data\Refund;
@@ -12,59 +13,54 @@ use LnkFlow\Laravel\Data\Sale;
 use LnkFlow\Laravel\Events\ConversionQueued;
 use LnkFlow\Laravel\Jobs\SendConversionJob;
 
+/**
+ * Queues conversions after the host transaction commits.
+ *
+ * Nothing here performs a network call: a failed report must never take a
+ * checkout down with it.
+ */
 final readonly class ConversionDispatcher
 {
     public function __construct(private JourneyContext $context) {}
 
     public function event(NamedEvent $event): void
     {
-        $enriched = new NamedEvent(
-            $event->name,
-            $event->customerExternalId,
-            $this->context->enrich($event->context),
-        );
-        $this->dispatch('event', $enriched, $event->customerExternalId.':'.$event->name);
+        $this->dispatch('event', $this->enrich($event), $event->customerExternalId.':'.$event->name);
     }
 
     public function lead(Lead $lead): void
     {
-        $enriched = new Lead(
-            $lead->customerExternalId,
-            $lead->eventName,
-            $this->context->enrich($lead->context),
-        );
-        $this->dispatch('lead', $enriched, $lead->customerExternalId.':'.$lead->eventName);
+        $this->dispatch('lead', $this->enrich($lead), $lead->customerExternalId.':'.$lead->eventName);
     }
 
     public function sale(Sale $sale): void
     {
-        $enriched = new Sale(
-            $sale->invoiceId,
-            $sale->amount,
-            $sale->currency,
-            $sale->customerExternalId,
-            $this->context->enrich($sale->context),
-        );
-        $this->dispatch('sale', $enriched, $sale->invoiceId);
+        $this->dispatch('sale', $this->enrich($sale), $sale->invoiceId);
     }
 
+    /**
+     * Refunds carry no journey context: they attribute through the original
+     * sale, so there is no reason to move visitor or click identifiers around.
+     */
     public function refund(Refund $refund): void
     {
-        $enriched = new Refund(
-            $refund->invoiceId,
-            $refund->refundId,
-            $refund->amount,
-            $refund->currency,
-            $this->context->enrich($refund->context),
-        );
-        $this->dispatch('refund', $enriched, $refund->refundId);
+        $this->dispatch('refund', $refund, $refund->businessId());
+    }
+
+    private function enrich(Payload $payload): Payload
+    {
+        $context = $this->context->enrich([]);
+
+        return $context === [] ? $payload : new EnrichedPayload($payload, $context);
     }
 
     private function dispatch(string $type, Payload $payload, string $businessId): void
     {
+        $queue = config('lnkflow.conversions.queue');
+
         event(new ConversionQueued($type, $businessId));
         SendConversionJob::dispatch($type, $payload, $businessId)
-            ->onQueue(config('lnkflow.conversions.queue'))
+            ->onQueue(is_string($queue) ? $queue : null)
             ->afterCommit();
     }
 }

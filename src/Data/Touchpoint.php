@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Data;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 use LnkFlow\Laravel\Contracts\Payload;
 
+/**
+ * A recorded arrival from a tracked click.
+ *
+ * Capture requires granted storage consent. Denied or unknown consent means
+ * nothing is stored locally and nothing is sent.
+ */
 final readonly class Touchpoint implements Payload
 {
-    /** @param array<string, mixed> $consent */
     public function __construct(
         public string $visitorId,
         public string $clickId,
-        public array $consent,
+        public Consent $consent,
         public ?int $websiteId = null,
-        public ?DateTimeImmutable $capturedAt = null,
+        public ?DateTimeInterface $capturedAt = null,
         public ?string $captureMethod = 'backend',
     ) {}
 
@@ -27,7 +32,7 @@ final readonly class Touchpoint implements Payload
             'click_id' => $this->clickId,
             'captured_at' => $this->capturedAt?->format(DATE_ATOM),
             'capture_method' => $this->captureMethod,
-            'consent' => $this->consent,
+            'consent' => $this->consent->toArray(),
         ], static fn (mixed $value): bool => $value !== null);
     }
 }

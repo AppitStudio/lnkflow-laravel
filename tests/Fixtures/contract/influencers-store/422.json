@@ -1,0 +1,24 @@
+{
+    "endpoint": "influencers-store",
+    "case": "Missing name.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/influencers",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "The name field is required.",
+        "errors": {
+            "name": [
+                "The name field is required."
+            ]
+        }
+    }
+}

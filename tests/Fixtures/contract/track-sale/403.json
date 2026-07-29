@@ -1,0 +1,21 @@
+{
+    "endpoint": "track-sale",
+    "case": "A read-only token cannot report conversions.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/track/sale",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 403,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "600",
+        "x-ratelimit-remaining": "593"
+    },
+    "body": {
+        "message": "This token cannot track conversions. Create one with conversion access in LnkFlow → Settings → API Tokens."
+    }
+}

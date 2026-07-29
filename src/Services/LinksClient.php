@@ -18,7 +18,7 @@ final class LinksClient extends AbstractClient
      */
     public function list(array $filters = []): Page
     {
-        return $this->page($this->transport->send('GET', 'links', $filters));
+        return $this->paginate('links', $filters, static fn (array $item): Link => new Link($item));
     }
 
     /**
@@ -27,42 +27,51 @@ final class LinksClient extends AbstractClient
      */
     public function forCampaign(int $campaignId, array $filters = []): Page
     {
-        return $this->page($this->transport->send('GET', "campaigns/{$campaignId}/links", $filters));
+        return $this->paginate(
+            "campaigns/{$campaignId}/links",
+            $filters,
+            static fn (array $item): Link => new Link($item),
+        );
     }
 
     public function get(int $id): Link
     {
-        return new Link($this->data($this->transport->send('GET', "links/{$id}")));
+        return new Link($this->transport->send('GET', "links/{$id}")->data());
     }
 
+    /**
+     * Side-effect-free validation. Note this still needs a token with the
+     * `write` ability — a read-only token gets a 403.
+     */
     public function preview(CreateLink $request, ?int $campaignId = null, ?string $campaignName = null): Resource
     {
-        return new Resource($this->data($this->transport->send('POST', 'links/preview', json: [
+        return new Resource($this->transport->send('POST', 'links/preview', json: array_filter([
             ...$request->toArray(),
             'campaign_id' => $campaignId,
             'campaign_name' => $campaignName,
-        ])));
+        ], static fn (mixed $value): bool => $value !== null))->data());
     }
 
     public function create(int $campaignId, CreateLink $request, string $idempotencyKey): Link
     {
-        return new Link($this->data($this->transport->send(
+        $response = $this->transport->send(
             'POST',
             "campaigns/{$campaignId}/links",
             json: $request->toArray(),
             headers: ['Idempotency-Key' => $idempotencyKey],
-        )));
+        );
+
+        return new Link($response->data(), $response);
     }
 
     public function update(int $id, UpdateLink $request): Link
     {
-        return new Link($this->data($this->transport->send(
-            'PATCH',
-            "links/{$id}",
-            json: $request->toArray(),
-        )));
+        $response = $this->transport->send('PATCH', "links/{$id}", json: $request->toArray());
+
+        return new Link($response->data(), $response);
     }
 
+    /** Pause a link. This is the safe alternative to deleting it. */
     public function deactivate(int $id): Link
     {
         return $this->update($id, new UpdateLink(['is_active' => false]));
@@ -71,18 +80,5 @@ final class LinksClient extends AbstractClient
     public function delete(int $id): void
     {
         $this->transport->send('DELETE', "links/{$id}");
-    }
-
-    /**
-     * @param  array<string, mixed>  $payload
-     * @return Page<Link>
-     */
-    private function page(array $payload): Page
-    {
-        return new Page(
-            array_map(fn (array $item): Link => new Link($item), $this->collection($payload)),
-            is_array($payload['meta'] ?? null) ? $payload['meta'] : [],
-            is_array($payload['links'] ?? null) ? $payload['links'] : [],
-        );
     }
 }

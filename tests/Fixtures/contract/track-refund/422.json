@@ -1,0 +1,26 @@
+{
+    "endpoint": "track-refund",
+    "case": "The referenced sale does not exist for this team.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/track/refund",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "600",
+        "x-ratelimit-remaining": "588"
+    },
+    "body": {
+        "message": "No sale with this invoice_id exists for this team.",
+        "errors": {
+            "original_invoice_id": [
+                "No sale with this invoice_id exists for this team."
+            ]
+        }
+    }
+}

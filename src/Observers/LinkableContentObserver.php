@@ -29,7 +29,7 @@ final class LinkableContentObserver
 
         if ($key !== null) {
             DisableLinkableContentJob::dispatch($model::class, $key)
-                ->onQueue(config('lnkflow.content.queue'))
+                ->onQueue($this->queue())
                 ->afterCommit();
         }
     }
@@ -40,9 +40,17 @@ final class LinkableContentObserver
 
         if (is_scalar($key)) {
             SyncLinkableContentJob::dispatch($model::class, (string) $key)
-                ->onQueue(config('lnkflow.content.queue'))
+                ->onQueue($this->queue())
                 ->afterCommit();
         }
+    }
+
+    /** The configured content queue, or null for the default queue. */
+    private function queue(): ?string
+    {
+        $queue = config('lnkflow.content.queue');
+
+        return is_string($queue) ? $queue : null;
     }
 
     private function sourceKey(Model $model): ?string

@@ -6,6 +6,12 @@ namespace LnkFlow\Laravel\Data;
 
 use LnkFlow\Laravel\Contracts\Payload;
 
+/**
+ * A new campaign — the container links are created under.
+ *
+ * `$slug` is the campaign's own slug, sent as `campaign_slug`. It is not the
+ * short-link slug; that belongs to the link.
+ */
 final readonly class CreateCampaign implements Payload
 {
     public function __construct(
@@ -13,7 +19,7 @@ final readonly class CreateCampaign implements Payload
         public ?string $slug = null,
         public ?string $description = null,
         public ?int $websiteId = null,
-        public bool $active = true,
+        public ?bool $active = null,
     ) {}
 
     public function toArray(): array

@@ -1,0 +1,21 @@
+{
+    "endpoint": "campaign-links-store",
+    "case": "Campaign belongs to another team.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/campaigns/2/links",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 404,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "20",
+        "x-ratelimit-remaining": "7"
+    },
+    "body": {
+        "message": "No query results for model [App\\Models\\Campaign] 2"
+    }
+}

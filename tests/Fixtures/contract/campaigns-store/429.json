@@ -1,0 +1,22 @@
+{
+    "endpoint": "campaigns-store",
+    "case": "The per-user link-creation budget is exhausted. Retry-After is authoritative.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/campaigns",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 429,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "retry-after": "60",
+        "x-ratelimit-limit": "20",
+        "x-ratelimit-remaining": "0"
+    },
+    "body": {
+        "message": "Too Many Attempts."
+    }
+}

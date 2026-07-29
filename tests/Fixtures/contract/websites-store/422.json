@@ -1,0 +1,24 @@
+{
+    "endpoint": "websites-store",
+    "case": "Duplicate name for the same team.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/websites",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "The name has already been taken.",
+        "errors": {
+            "name": [
+                "The name has already been taken."
+            ]
+        }
+    }
+}

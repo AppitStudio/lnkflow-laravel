@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use LnkFlow\Laravel\Contracts\LinkableContent;
 use LnkFlow\Laravel\Data\CreateCampaign;
 use LnkFlow\Laravel\Data\LinkDefinition;
+use LnkFlow\Laravel\Data\UpdateCampaign;
 use LnkFlow\Laravel\Data\UpdateLink;
 use LnkFlow\Laravel\Events\ContentSynchronizationFailed;
 use LnkFlow\Laravel\Events\ContentSynchronized;
@@ -119,6 +120,30 @@ final readonly class ContentSynchronizer
                 'state' => 'synced',
                 'last_synced_at' => now(),
             ]);
+        } elseif (! hash_equals((string) $campaign->payload_hash, $campaignHash)) {
+            // Reconcile campaign drift. Without this a renamed campaign or a
+            // moved website is computed on every sync and silently discarded,
+            // so the remote campaign can never catch up with the source.
+            //
+            // Only the fields the adapter actually owns are sent. `is_active`
+            // is deliberately excluded: the API forwards it to the primary
+            // link, so including it would un-pause a campaign or link paused
+            // by hand in the dashboard.
+            $this->scopedClient()->campaigns()->update(
+                (int) $campaign->remote_campaign_id,
+                new UpdateCampaign(array_filter([
+                    'name' => $definition->campaignName,
+                    'website_id' => $definition->websiteId,
+                ], static fn (mixed $value): bool => $value !== null)),
+            );
+            $campaign->update([
+                'payload_hash' => $campaignHash,
+                'state' => 'synced',
+                'last_error_code' => null,
+                'last_request_id' => null,
+                'last_error_message' => null,
+                'last_synced_at' => now(),
+            ]);
         }
 
         $mapping = LinkMapping::query()->firstOrCreate(
@@ -158,6 +183,11 @@ final readonly class ContentSynchronizer
                     $mapping->idempotency_key,
                 );
             } else {
+                // `CreateLink` omits `is_active` and `conversion_tracking_enabled`
+                // unless the adapter set them explicitly, so a link paused — or a
+                // link with conversion tracking switched on — in the LnkFlow
+                // dashboard survives the next content change instead of being
+                // silently reset by the sync.
                 $remote = $this->scopedClient()->links()->update(
                     (int) $mapping->remote_link_id,
                     new UpdateLink($payload->toArray()),
@@ -251,7 +281,7 @@ final readonly class ContentSynchronizer
 
     private function connection(): string
     {
-        return (string) config('lnkflow.default', 'default');
+        return config()->string('lnkflow.default', 'default');
     }
 
     private function team(): string
@@ -274,8 +304,12 @@ final readonly class ContentSynchronizer
     }
 
     /**
-     * @param  array<string, mixed>  $payload
-     * @return array<string, mixed>
+     * Nested values are whatever the payload carries, lists included, so this
+     * is keyed by `array-key` rather than by the string keys of the top-level
+     * payload it is first called with.
+     *
+     * @param  array<array-key, mixed>  $payload
+     * @return array<array-key, mixed>
      */
     private function canonicalize(array $payload): array
     {

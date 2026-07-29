@@ -7,11 +7,13 @@ namespace LnkFlow\Laravel\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
+use LnkFlow\Laravel\Jobs\Concerns\ReportsApiFailures;
 use LnkFlow\Laravel\Services\ContentSynchronizer;
 
 final class DisableLinkableContentJob implements ShouldQueue
 {
     use Queueable;
+    use ReportsApiFailures;
 
     public function __construct(
         public readonly string $modelClass,
@@ -30,6 +32,9 @@ final class DisableLinkableContentJob implements ShouldQueue
 
     public function handle(ContentSynchronizer $synchronizer): void
     {
-        $synchronizer->disableSource($this->modelClass, $this->sourceKey);
+        $this->callApi(fn (): mixed => $synchronizer->disableSource(
+            $this->modelClass,
+            $this->sourceKey,
+        ));
     }
 }

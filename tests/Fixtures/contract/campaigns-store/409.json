@@ -1,0 +1,22 @@
+{
+    "endpoint": "campaigns-store",
+    "case": "A concurrent duplicate while the first request is still in flight.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/campaigns",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 409,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "20",
+        "x-ratelimit-remaining": "12"
+    },
+    "body": {
+        "message": "Another request with this idempotency key is still being processed.",
+        "code": "IDEMPOTENCY_IN_PROGRESS"
+    }
+}

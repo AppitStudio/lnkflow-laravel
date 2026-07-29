@@ -1,0 +1,44 @@
+{
+    "endpoint": "influencers-show",
+    "case": "A single influencer.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/influencers/1",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "id": 1,
+            "name": "Nova Rivers",
+            "slug": "nova-rivers",
+            "primary_platform": "youtube",
+            "primary_handle": "novarivers",
+            "display_handle": "@novarivers",
+            "contact_email": null,
+            "website_url": "https://novarivers.example",
+            "social_links": {
+                "youtube": "https://youtube.example/novarivers"
+            },
+            "metadata": {
+                "niche": "Creator economy"
+            },
+            "notes": null,
+            "is_active": true,
+            "campaigns_count": 0,
+            "links_count": 1,
+            "active_links_count": 1,
+            "total_clicks": 1,
+            "created_at": "2026-01-15T12:00:00+00:00",
+            "updated_at": "2026-01-15T12:00:00+00:00",
+            "sales_count": 0,
+            "total_revenue_cents": 0
+        }
+    }
+}

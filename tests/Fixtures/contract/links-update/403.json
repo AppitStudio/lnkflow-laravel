@@ -1,0 +1,19 @@
+{
+    "endpoint": "links-update",
+    "case": "A read-only token cannot write.",
+    "request": {
+        "method": "PATCH",
+        "path": "/api/v1/links/1",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 403,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "This token is read-only. Create one with write access in LnkFlow → Settings → API Tokens."
+    }
+}

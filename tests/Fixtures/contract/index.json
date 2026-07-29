@@ -1,0 +1,895 @@
+{
+    "fixtures": [
+        {
+            "endpoint": "me",
+            "method": "GET",
+            "path": "/api/v1/me",
+            "status": 200,
+            "variant": null,
+            "file": "me/200.json",
+            "case": "Token check: identity, capabilities and short-link domain."
+        },
+        {
+            "endpoint": "me",
+            "method": "GET",
+            "path": "/api/v1/me",
+            "status": 401,
+            "variant": null,
+            "file": "me/401.json",
+            "case": "No bearer token. The envelope is identical on every authenticated endpoint."
+        },
+        {
+            "endpoint": "me",
+            "method": "GET",
+            "path": "/api/v1/me",
+            "status": 403,
+            "variant": null,
+            "file": "me/403.json",
+            "case": "X-LnkFlow-Team names a team the token cannot reach. Reachable on every endpoint."
+        },
+        {
+            "endpoint": "search",
+            "method": "GET",
+            "path": "/api/v1/search",
+            "status": 200,
+            "variant": null,
+            "file": "search/200.json",
+            "case": "Cross-entity search used by the extension omnibox."
+        },
+        {
+            "endpoint": "search",
+            "method": "GET",
+            "path": "/api/v1/search",
+            "status": 401,
+            "variant": null,
+            "file": "search/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "search",
+            "method": "GET",
+            "path": "/api/v1/search",
+            "status": 422,
+            "variant": null,
+            "file": "search/422.json",
+            "case": "The required q parameter is missing."
+        },
+        {
+            "endpoint": "browser-extension-bootstrap",
+            "method": "GET",
+            "path": "/api/v1/browser-extension/bootstrap",
+            "status": 200,
+            "variant": null,
+            "file": "browser-extension-bootstrap/200.json",
+            "case": "Popup startup bundle: websites, domains, influencers."
+        },
+        {
+            "endpoint": "browser-extension-bootstrap",
+            "method": "GET",
+            "path": "/api/v1/browser-extension/bootstrap",
+            "status": 401,
+            "variant": null,
+            "file": "browser-extension-bootstrap/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "campaigns-index",
+            "method": "GET",
+            "path": "/api/v1/campaigns",
+            "status": 200,
+            "variant": null,
+            "file": "campaigns-index/200.json",
+            "case": "Paginated campaign list."
+        },
+        {
+            "endpoint": "campaigns-index",
+            "method": "GET",
+            "path": "/api/v1/campaigns",
+            "status": 401,
+            "variant": null,
+            "file": "campaigns-index/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "campaigns-show",
+            "method": "GET",
+            "path": "/api/v1/campaigns/1",
+            "status": 200,
+            "variant": null,
+            "file": "campaigns-show/200.json",
+            "case": "A single campaign with its primary link."
+        },
+        {
+            "endpoint": "campaigns-show",
+            "method": "GET",
+            "path": "/api/v1/campaigns/1",
+            "status": 401,
+            "variant": null,
+            "file": "campaigns-show/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "campaigns-show",
+            "method": "GET",
+            "path": "/api/v1/campaigns/2",
+            "status": 404,
+            "variant": null,
+            "file": "campaigns-show/404.json",
+            "case": "A campaign owned by another team is indistinguishable from a missing one."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 201,
+            "variant": null,
+            "file": "campaigns-store/201.json",
+            "case": "Create a campaign container."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 401,
+            "variant": null,
+            "file": "campaigns-store/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 403,
+            "variant": null,
+            "file": "campaigns-store/403.json",
+            "case": "A read-only token cannot write."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 422,
+            "variant": null,
+            "file": "campaigns-store/422.json",
+            "case": "Malformed slug and destination URL."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 201,
+            "variant": "idempotent-first",
+            "file": "campaigns-store/201-idempotent-first.json",
+            "case": "First request under an Idempotency-Key."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 201,
+            "variant": "idempotent-replay",
+            "file": "campaigns-store/201-idempotent-replay.json",
+            "case": "Identical retry: the stored response is replayed and Idempotent-Replayed is set."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 422,
+            "variant": "idempotency-key-reused",
+            "file": "campaigns-store/422-idempotency-key-reused.json",
+            "case": "Same key, different canonical payload."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 201,
+            "variant": "idempotent-seed",
+            "file": "campaigns-store/201-idempotent-seed.json",
+            "case": "Seed for the in-progress conflict below."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 409,
+            "variant": null,
+            "file": "campaigns-store/409.json",
+            "case": "A concurrent duplicate while the first request is still in flight."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 422,
+            "variant": "invalid-idempotency-key",
+            "file": "campaigns-store/422-invalid-idempotency-key.json",
+            "case": "A malformed Idempotency-Key is rejected before any work happens."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 422,
+            "variant": "validation-does-not-reserve-key",
+            "file": "campaigns-store/422-validation-does-not-reserve-key.json",
+            "case": "Unused key, kept so the corpus documents the header name."
+        },
+        {
+            "endpoint": "campaign-links-index",
+            "method": "GET",
+            "path": "/api/v1/campaigns/1/links",
+            "status": 200,
+            "variant": null,
+            "file": "campaign-links-index/200.json",
+            "case": "Links under a campaign."
+        },
+        {
+            "endpoint": "campaign-links-index",
+            "method": "GET",
+            "path": "/api/v1/campaigns/1/links",
+            "status": 401,
+            "variant": null,
+            "file": "campaign-links-index/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "campaign-links-index",
+            "method": "GET",
+            "path": "/api/v1/campaigns/2/links",
+            "status": 404,
+            "variant": null,
+            "file": "campaign-links-index/404.json",
+            "case": "Campaign belongs to another team."
+        },
+        {
+            "endpoint": "campaign-links-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns/1/links",
+            "status": 201,
+            "variant": null,
+            "file": "campaign-links-store/201.json",
+            "case": "Create a tracked link under a campaign."
+        },
+        {
+            "endpoint": "campaign-links-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns/1/links",
+            "status": 401,
+            "variant": null,
+            "file": "campaign-links-store/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "campaign-links-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns/1/links",
+            "status": 403,
+            "variant": null,
+            "file": "campaign-links-store/403.json",
+            "case": "A read-only token cannot write."
+        },
+        {
+            "endpoint": "campaign-links-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns/2/links",
+            "status": 404,
+            "variant": null,
+            "file": "campaign-links-store/404.json",
+            "case": "Campaign belongs to another team."
+        },
+        {
+            "endpoint": "campaign-links-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns/1/links",
+            "status": 422,
+            "variant": null,
+            "file": "campaign-links-store/422.json",
+            "case": "Slug already used on the same domain."
+        },
+        {
+            "endpoint": "links-show",
+            "method": "GET",
+            "path": "/api/v1/links/1",
+            "status": 200,
+            "variant": null,
+            "file": "links-show/200.json",
+            "case": "A single tracked link."
+        },
+        {
+            "endpoint": "links-show",
+            "method": "GET",
+            "path": "/api/v1/links/1",
+            "status": 401,
+            "variant": null,
+            "file": "links-show/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "links-show",
+            "method": "GET",
+            "path": "/api/v1/links/2",
+            "status": 404,
+            "variant": null,
+            "file": "links-show/404.json",
+            "case": "Link belongs to another team."
+        },
+        {
+            "endpoint": "links-update",
+            "method": "PATCH",
+            "path": "/api/v1/links/1",
+            "status": 200,
+            "variant": null,
+            "file": "links-update/200.json",
+            "case": "Partial update: pause a link and change its destination."
+        },
+        {
+            "endpoint": "links-update",
+            "method": "PATCH",
+            "path": "/api/v1/links/1",
+            "status": 200,
+            "variant": "reactivate",
+            "file": "links-update/200-reactivate.json",
+            "case": "Re-activate the link so later fixtures see an active one."
+        },
+        {
+            "endpoint": "links-update",
+            "method": "PATCH",
+            "path": "/api/v1/links/1",
+            "status": 401,
+            "variant": null,
+            "file": "links-update/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "links-update",
+            "method": "PATCH",
+            "path": "/api/v1/links/1",
+            "status": 403,
+            "variant": null,
+            "file": "links-update/403.json",
+            "case": "A read-only token cannot write."
+        },
+        {
+            "endpoint": "links-update",
+            "method": "PATCH",
+            "path": "/api/v1/links/2",
+            "status": 404,
+            "variant": null,
+            "file": "links-update/404.json",
+            "case": "Link belongs to another team."
+        },
+        {
+            "endpoint": "links-update",
+            "method": "PATCH",
+            "path": "/api/v1/links/1",
+            "status": 422,
+            "variant": null,
+            "file": "links-update/422.json",
+            "case": "Invalid destination URL and promo code."
+        },
+        {
+            "endpoint": "links-preview",
+            "method": "POST",
+            "path": "/api/v1/links/preview",
+            "status": 200,
+            "variant": null,
+            "file": "links-preview/200.json",
+            "case": "Side-effect-free dry run of a link that does not exist yet."
+        },
+        {
+            "endpoint": "links-preview",
+            "method": "POST",
+            "path": "/api/v1/links/preview",
+            "status": 401,
+            "variant": null,
+            "file": "links-preview/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "links-preview",
+            "method": "POST",
+            "path": "/api/v1/links/preview",
+            "status": 403,
+            "variant": null,
+            "file": "links-preview/403.json",
+            "case": "A read-only token cannot preview (preview is a write-ability endpoint)."
+        },
+        {
+            "endpoint": "links-preview",
+            "method": "POST",
+            "path": "/api/v1/links/preview",
+            "status": 422,
+            "variant": null,
+            "file": "links-preview/422.json",
+            "case": "Neither campaign_id nor campaign_name, and an invalid destination."
+        },
+        {
+            "endpoint": "websites-index",
+            "method": "GET",
+            "path": "/api/v1/websites",
+            "status": 200,
+            "variant": null,
+            "file": "websites-index/200.json",
+            "case": "Website list."
+        },
+        {
+            "endpoint": "websites-index",
+            "method": "GET",
+            "path": "/api/v1/websites",
+            "status": 401,
+            "variant": null,
+            "file": "websites-index/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "websites-show",
+            "method": "GET",
+            "path": "/api/v1/websites/1",
+            "status": 200,
+            "variant": null,
+            "file": "websites-show/200.json",
+            "case": "A single website."
+        },
+        {
+            "endpoint": "websites-show",
+            "method": "GET",
+            "path": "/api/v1/websites/1",
+            "status": 401,
+            "variant": null,
+            "file": "websites-show/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "websites-show",
+            "method": "GET",
+            "path": "/api/v1/websites/2",
+            "status": 404,
+            "variant": null,
+            "file": "websites-show/404.json",
+            "case": "Website belongs to another team."
+        },
+        {
+            "endpoint": "websites-store",
+            "method": "POST",
+            "path": "/api/v1/websites",
+            "status": 201,
+            "variant": null,
+            "file": "websites-store/201.json",
+            "case": "Create a website."
+        },
+        {
+            "endpoint": "websites-store",
+            "method": "POST",
+            "path": "/api/v1/websites",
+            "status": 401,
+            "variant": null,
+            "file": "websites-store/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "websites-store",
+            "method": "POST",
+            "path": "/api/v1/websites",
+            "status": 403,
+            "variant": null,
+            "file": "websites-store/403.json",
+            "case": "A read-only token cannot write."
+        },
+        {
+            "endpoint": "websites-store",
+            "method": "POST",
+            "path": "/api/v1/websites",
+            "status": 422,
+            "variant": null,
+            "file": "websites-store/422.json",
+            "case": "Duplicate name for the same team."
+        },
+        {
+            "endpoint": "influencers-index",
+            "method": "GET",
+            "path": "/api/v1/influencers",
+            "status": 200,
+            "variant": null,
+            "file": "influencers-index/200.json",
+            "case": "Influencer list with click and revenue aggregates."
+        },
+        {
+            "endpoint": "influencers-index",
+            "method": "GET",
+            "path": "/api/v1/influencers",
+            "status": 401,
+            "variant": null,
+            "file": "influencers-index/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "influencers-show",
+            "method": "GET",
+            "path": "/api/v1/influencers/1",
+            "status": 200,
+            "variant": null,
+            "file": "influencers-show/200.json",
+            "case": "A single influencer."
+        },
+        {
+            "endpoint": "influencers-show",
+            "method": "GET",
+            "path": "/api/v1/influencers/1",
+            "status": 401,
+            "variant": null,
+            "file": "influencers-show/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "influencers-show",
+            "method": "GET",
+            "path": "/api/v1/influencers/2",
+            "status": 404,
+            "variant": null,
+            "file": "influencers-show/404.json",
+            "case": "Influencer belongs to another team."
+        },
+        {
+            "endpoint": "influencers-store",
+            "method": "POST",
+            "path": "/api/v1/influencers",
+            "status": 201,
+            "variant": null,
+            "file": "influencers-store/201.json",
+            "case": "Create an influencer."
+        },
+        {
+            "endpoint": "influencers-store",
+            "method": "POST",
+            "path": "/api/v1/influencers",
+            "status": 401,
+            "variant": null,
+            "file": "influencers-store/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "influencers-store",
+            "method": "POST",
+            "path": "/api/v1/influencers",
+            "status": 403,
+            "variant": null,
+            "file": "influencers-store/403.json",
+            "case": "A read-only token cannot write."
+        },
+        {
+            "endpoint": "influencers-store",
+            "method": "POST",
+            "path": "/api/v1/influencers",
+            "status": 422,
+            "variant": null,
+            "file": "influencers-store/422.json",
+            "case": "Missing name."
+        },
+        {
+            "endpoint": "domains-index",
+            "method": "GET",
+            "path": "/api/v1/domains",
+            "status": 200,
+            "variant": null,
+            "file": "domains-index/200.json",
+            "case": "Branded domains usable for short links."
+        },
+        {
+            "endpoint": "domains-index",
+            "method": "GET",
+            "path": "/api/v1/domains",
+            "status": 401,
+            "variant": null,
+            "file": "domains-index/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "stats-summary",
+            "method": "GET",
+            "path": "/api/v1/stats/summary",
+            "status": 200,
+            "variant": null,
+            "file": "stats-summary/200.json",
+            "case": "Click totals and time series for the default window."
+        },
+        {
+            "endpoint": "stats-summary",
+            "method": "GET",
+            "path": "/api/v1/stats/summary",
+            "status": 401,
+            "variant": null,
+            "file": "stats-summary/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "stats-summary",
+            "method": "GET",
+            "path": "/api/v1/stats/summary",
+            "status": 422,
+            "variant": null,
+            "file": "stats-summary/422.json",
+            "case": "Malformed date and unsupported grouping."
+        },
+        {
+            "endpoint": "track-lead",
+            "method": "POST",
+            "path": "/api/v1/track/lead",
+            "status": 201,
+            "variant": null,
+            "file": "track-lead/201.json",
+            "case": "Report a lead against a click."
+        },
+        {
+            "endpoint": "track-lead",
+            "method": "POST",
+            "path": "/api/v1/track/lead",
+            "status": 200,
+            "variant": "duplicate",
+            "file": "track-lead/200-duplicate.json",
+            "case": "The same lead again: idempotent, flagged as a duplicate."
+        },
+        {
+            "endpoint": "track-lead",
+            "method": "POST",
+            "path": "/api/v1/track/lead",
+            "status": 401,
+            "variant": null,
+            "file": "track-lead/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "track-lead",
+            "method": "POST",
+            "path": "/api/v1/track/lead",
+            "status": 403,
+            "variant": null,
+            "file": "track-lead/403.json",
+            "case": "A read-only token cannot report conversions."
+        },
+        {
+            "endpoint": "track-lead",
+            "method": "POST",
+            "path": "/api/v1/track/lead",
+            "status": 422,
+            "variant": null,
+            "file": "track-lead/422.json",
+            "case": "Neither click_id nor customer_external_id."
+        },
+        {
+            "endpoint": "track-sale",
+            "method": "POST",
+            "path": "/api/v1/track/sale",
+            "status": 201,
+            "variant": null,
+            "file": "track-sale/201.json",
+            "case": "Report a sale in integer minor units."
+        },
+        {
+            "endpoint": "track-sale",
+            "method": "POST",
+            "path": "/api/v1/track/sale",
+            "status": 200,
+            "variant": "duplicate",
+            "file": "track-sale/200-duplicate.json",
+            "case": "The same invoice again: idempotent, flagged as a duplicate."
+        },
+        {
+            "endpoint": "track-sale",
+            "method": "POST",
+            "path": "/api/v1/track/sale",
+            "status": 401,
+            "variant": null,
+            "file": "track-sale/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "track-sale",
+            "method": "POST",
+            "path": "/api/v1/track/sale",
+            "status": 403,
+            "variant": null,
+            "file": "track-sale/403.json",
+            "case": "A read-only token cannot report conversions."
+        },
+        {
+            "endpoint": "track-sale",
+            "method": "POST",
+            "path": "/api/v1/track/sale",
+            "status": 422,
+            "variant": null,
+            "file": "track-sale/422.json",
+            "case": "Float money and a missing invoice_id."
+        },
+        {
+            "endpoint": "track-refund",
+            "method": "POST",
+            "path": "/api/v1/track/refund",
+            "status": 201,
+            "variant": null,
+            "file": "track-refund/201.json",
+            "case": "Full refund of a known sale."
+        },
+        {
+            "endpoint": "track-refund",
+            "method": "POST",
+            "path": "/api/v1/track/refund",
+            "status": 200,
+            "variant": "duplicate",
+            "file": "track-refund/200-duplicate.json",
+            "case": "The same refund again: idempotent, flagged as a duplicate."
+        },
+        {
+            "endpoint": "track-refund",
+            "method": "POST",
+            "path": "/api/v1/track/refund",
+            "status": 401,
+            "variant": null,
+            "file": "track-refund/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "track-refund",
+            "method": "POST",
+            "path": "/api/v1/track/refund",
+            "status": 403,
+            "variant": null,
+            "file": "track-refund/403.json",
+            "case": "A read-only token cannot report conversions."
+        },
+        {
+            "endpoint": "track-refund",
+            "method": "POST",
+            "path": "/api/v1/track/refund",
+            "status": 422,
+            "variant": null,
+            "file": "track-refund/422.json",
+            "case": "The referenced sale does not exist for this team."
+        },
+        {
+            "endpoint": "track-events",
+            "method": "GET",
+            "path": "/api/v1/track/events",
+            "status": 200,
+            "variant": null,
+            "file": "track-events/200.json",
+            "case": "The verification feed: every conversion event for the team."
+        },
+        {
+            "endpoint": "track-events",
+            "method": "GET",
+            "path": "/api/v1/track/events",
+            "status": 200,
+            "variant": "read-only-token",
+            "file": "track-events/200-read-only-token.json",
+            "case": "Read-only tokens may read the feed."
+        },
+        {
+            "endpoint": "track-events",
+            "method": "GET",
+            "path": "/api/v1/track/events",
+            "status": 401,
+            "variant": null,
+            "file": "track-events/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "track-events",
+            "method": "GET",
+            "path": "/api/v1/track/events",
+            "status": 422,
+            "variant": null,
+            "file": "track-events/422.json",
+            "case": "Unsupported type filter."
+        },
+        {
+            "endpoint": "stats-conversions",
+            "method": "GET",
+            "path": "/api/v1/stats/conversions",
+            "status": 200,
+            "variant": null,
+            "file": "stats-conversions/200.json",
+            "case": "Conversion funnel, series and source split."
+        },
+        {
+            "endpoint": "stats-conversions",
+            "method": "GET",
+            "path": "/api/v1/stats/conversions",
+            "status": 401,
+            "variant": null,
+            "file": "stats-conversions/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "journeys-touchpoints",
+            "method": "POST",
+            "path": "/api/v1/journeys/touchpoints",
+            "status": 201,
+            "variant": null,
+            "file": "journeys-touchpoints/201.json",
+            "case": "Capture a touchpoint for a click this team owns."
+        },
+        {
+            "endpoint": "journeys-touchpoints",
+            "method": "POST",
+            "path": "/api/v1/journeys/touchpoints",
+            "status": 200,
+            "variant": "duplicate",
+            "file": "journeys-touchpoints/200-duplicate.json",
+            "case": "The same touchpoint again: idempotent, flagged as a duplicate."
+        },
+        {
+            "endpoint": "journeys-touchpoints",
+            "method": "POST",
+            "path": "/api/v1/journeys/touchpoints",
+            "status": 202,
+            "variant": null,
+            "file": "journeys-touchpoints/202.json",
+            "case": "Unknown or cross-tenant click id: accepted as pending, deliberately indistinguishable."
+        },
+        {
+            "endpoint": "journeys-touchpoints",
+            "method": "POST",
+            "path": "/api/v1/journeys/touchpoints",
+            "status": 401,
+            "variant": null,
+            "file": "journeys-touchpoints/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "journeys-touchpoints",
+            "method": "POST",
+            "path": "/api/v1/journeys/touchpoints",
+            "status": 403,
+            "variant": null,
+            "file": "journeys-touchpoints/403.json",
+            "case": "A read-only token cannot capture journeys."
+        },
+        {
+            "endpoint": "journeys-touchpoints",
+            "method": "POST",
+            "path": "/api/v1/journeys/touchpoints",
+            "status": 422,
+            "variant": null,
+            "file": "journeys-touchpoints/422.json",
+            "case": "Storage consent denied: nothing may be persisted."
+        },
+        {
+            "endpoint": "influencer-commissions",
+            "method": "GET",
+            "path": "/api/v1/influencers/1/commissions",
+            "status": 200,
+            "variant": null,
+            "file": "influencer-commissions/200.json",
+            "case": "Commission ledger rows (reporting only — never a payout)."
+        },
+        {
+            "endpoint": "influencer-commissions",
+            "method": "GET",
+            "path": "/api/v1/influencers/1/commissions",
+            "status": 401,
+            "variant": null,
+            "file": "influencer-commissions/401.json",
+            "case": "No bearer token."
+        },
+        {
+            "endpoint": "influencer-commissions",
+            "method": "GET",
+            "path": "/api/v1/influencers/2/commissions",
+            "status": 404,
+            "variant": null,
+            "file": "influencer-commissions/404.json",
+            "case": "Influencer belongs to another team."
+        },
+        {
+            "endpoint": "campaigns-store",
+            "method": "POST",
+            "path": "/api/v1/campaigns",
+            "status": 429,
+            "variant": null,
+            "file": "campaigns-store/429.json",
+            "case": "The per-user link-creation budget is exhausted. Retry-After is authoritative."
+        }
+    ]
+}

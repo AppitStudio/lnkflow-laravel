@@ -1,0 +1,95 @@
+{
+    "endpoint": "browser-extension-bootstrap",
+    "case": "Popup startup bundle: websites, domains, influencers.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/browser-extension/bootstrap",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "max-age=3600, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "user": {
+                "id": 1,
+                "name": "Contract Fixtures Team",
+                "url_prefix": "contract-fixtures",
+                "timezone": "UTC",
+                "main_domain": "app.lnkflow.io",
+                "link_domain": "mylnk.click"
+            },
+            "actor": {
+                "id": 1,
+                "name": "Ada Fixture",
+                "email": "owner@contract-fixtures.invalid"
+            },
+            "accounts": [
+                {
+                    "id": 1,
+                    "name": "Contract Fixtures Team",
+                    "role": "owner",
+                    "is_current": true
+                }
+            ],
+            "teams": [
+                {
+                    "id": 1,
+                    "name": "Contract Fixtures Team",
+                    "role": "owner",
+                    "is_current": true
+                }
+            ],
+            "active_team": {
+                "id": 1,
+                "name": "Contract Fixtures Team",
+                "role": "owner",
+                "is_current": true
+            },
+            "websites": [
+                {
+                    "id": 1,
+                    "name": "Storefront",
+                    "domain": "storefront.example",
+                    "default_custom_domain": {
+                        "id": 1,
+                        "domain": "lnk.storefront.example",
+                        "is_usable": true
+                    },
+                    "is_active": true,
+                    "created_at": "2026-01-15T12:00:00+00:00"
+                }
+            ],
+            "domains": [
+                {
+                    "id": 1,
+                    "domain": "lnk.storefront.example",
+                    "url": "https://lnk.storefront.example",
+                    "is_active": true,
+                    "is_verified": true,
+                    "is_usable": true,
+                    "ssl_status": "issued",
+                    "status": "Active",
+                    "created_at": "2026-01-15T12:00:00+00:00"
+                }
+            ],
+            "influencers": [
+                {
+                    "id": 1,
+                    "name": "Nova Rivers",
+                    "primary_platform": "youtube",
+                    "primary_handle": "novarivers",
+                    "is_active": true
+                }
+            ]
+        },
+        "meta": {
+            "cache_ttl_seconds": 3600,
+            "cache_signature": "5150bc4c8678349ca6cf0adca7f678a9"
+        }
+    }
+}

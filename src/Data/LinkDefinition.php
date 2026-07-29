@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Data;
 
+/**
+ * One link a piece of host content should have in LnkFlow.
+ *
+ * `$placement` identifies the link within the source record, so a piece of
+ * content can own several links (say a header CTA and a footer CTA) and each
+ * one keeps its own stable mapping.
+ */
 final readonly class LinkDefinition
 {
     /** @param array<string, string|null> $utm */
@@ -19,10 +26,12 @@ final readonly class LinkDefinition
         public ?int $customDomainId = null,
         public ?int $influencerId = null,
         public ?string $socialPlatform = null,
-        public bool $active = true,
-        public bool $conversionTrackingEnabled = false,
+        public ?bool $active = null,
+        public ?bool $conversionTrackingEnabled = null,
         public ?string $autoPromoCode = null,
-    ) {}
+    ) {
+        Utm::validate($utm);
+    }
 
     public function createLink(): CreateLink
     {

@@ -1,0 +1,19 @@
+{
+    "endpoint": "me",
+    "case": "No bearer token. The envelope is identical on every authenticated endpoint.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/me",
+        "query": null,
+        "authenticated": false
+    },
+    "status": 401,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "Unauthenticated."
+    }
+}

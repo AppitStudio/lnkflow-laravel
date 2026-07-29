@@ -1,6 +1,11 @@
 laravel: '@testbench'
 
 providers:
+  # The package under development is not installed into vendor/, so Composer
+  # package discovery cannot find it. The workbench app must load it explicitly
+  # or `composer serve` boots without any LnkFlow config, commands, or the
+  # <x-lnkflow-script /> component.
+  - LnkFlow\Laravel\LnkFlowServiceProvider
   # - Workbench\App\Providers\WorkbenchServiceProvider
 
 migrations:

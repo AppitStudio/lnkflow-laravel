@@ -22,7 +22,7 @@ final class DoctorCommand extends Command
 
     public function handle(Client $client, ConsentResolver $consent): int
     {
-        $connection = (string) config('lnkflow.default', 'default');
+        $connection = config()->string('lnkflow.default', 'default');
         $settings = config("lnkflow.connections.{$connection}", []);
         $failures = 0;
         $url = is_array($settings) ? ($settings['url'] ?? null) : null;
@@ -49,8 +49,11 @@ final class DoctorCommand extends Command
             $this->line('  storage consent default: '.ConsentState::Unknown->value);
         }
 
-        $this->line('  queue: '.(string) config('queue.default'));
-        $this->line('  session: '.(string) config('session.driver'));
+        $queue = config('queue.default');
+        $session = config('session.driver');
+
+        $this->line('  queue: '.(is_scalar($queue) ? (string) $queue : ''));
+        $this->line('  session: '.(is_scalar($session) ? (string) $session : ''));
         $this->line('  Cashier adapter: '.(config('lnkflow.cashier.enabled') === true ? 'enabled' : 'disabled'));
 
         if ($failures === 0) {

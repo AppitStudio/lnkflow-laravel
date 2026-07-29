@@ -1,0 +1,26 @@
+{
+    "endpoint": "track-lead",
+    "case": "Neither click_id nor customer_external_id.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/track/lead",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "600",
+        "x-ratelimit-remaining": "596"
+    },
+    "body": {
+        "message": "The customer external id field is required.",
+        "errors": {
+            "customer_external_id": [
+                "The customer external id field is required."
+            ]
+        }
+    }
+}

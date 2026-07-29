@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LnkFlow\Laravel\Services;
 
 use Illuminate\Contracts\Session\Session;
+use LnkFlow\Laravel\Support\Shape;
 
 final class JourneyContext
 {
@@ -13,9 +14,7 @@ final class JourneyContext
     /** @return array<string, mixed> */
     public function all(): array
     {
-        $value = $this->session->get($this->key(), []);
-
-        return is_array($value) ? $value : [];
+        return Shape::map($this->session->get($this->key(), []));
     }
 
     public function visitorId(): ?string
@@ -43,8 +42,9 @@ final class JourneyContext
     public function enrich(array $explicit): array
     {
         $state = $this->all();
+        $connection = config()->string('lnkflow.default', 'default');
         $context = array_filter([
-            'website_id' => config('lnkflow.connections.'.config('lnkflow.default').'.website'),
+            'website_id' => config('lnkflow.connections.'.$connection.'.website'),
             'visitor_id' => $state['visitor_id'] ?? null,
             'first_click_id' => $state['first_click_id'] ?? null,
             'click_id' => $state['last_click_id'] ?? null,
@@ -58,6 +58,6 @@ final class JourneyContext
 
     private function key(): string
     {
-        return (string) config('lnkflow.journeys.session_key', '_lnkflow');
+        return config()->string('lnkflow.journeys.session_key', '_lnkflow');
     }
 }

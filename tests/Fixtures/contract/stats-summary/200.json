@@ -1,0 +1,138 @@
+{
+    "endpoint": "stats-summary",
+    "case": "Click totals and time series for the default window.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/stats/summary",
+        "query": "from=2026-01-01&to=2026-01-15&group_by=day",
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "total_clicks": 1,
+            "series": [
+                {
+                    "period": "2026-01-01",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-02",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-03",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-04",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-05",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-06",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-07",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-08",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-09",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-10",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-11",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-12",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-13",
+                    "clicks": 0
+                },
+                {
+                    "period": "2026-01-14",
+                    "clicks": 1
+                },
+                {
+                    "period": "2026-01-15",
+                    "clicks": 0
+                }
+            ],
+            "campaigns": [
+                {
+                    "id": 3,
+                    "name": "Summer Launch",
+                    "slug": "summer-launch",
+                    "clicks": 0,
+                    "links_count": 0
+                },
+                {
+                    "id": 4,
+                    "name": "Autumn Launch",
+                    "slug": "autumn-launch",
+                    "clicks": 0,
+                    "links_count": 0
+                },
+                {
+                    "id": 5,
+                    "name": "Winter Launch",
+                    "slug": "winter-launch",
+                    "clicks": 0,
+                    "links_count": 0
+                },
+                {
+                    "id": 1,
+                    "name": "Spring Launch",
+                    "slug": "nova-youtube",
+                    "clicks": 1,
+                    "links_count": 2
+                }
+            ],
+            "links": [
+                {
+                    "id": 1,
+                    "campaign_id": 1,
+                    "name": "Nova YouTube",
+                    "slug": "nova-youtube",
+                    "short_url": "https://lnk.storefront.example/nova-youtube",
+                    "clicks": 1
+                },
+                {
+                    "id": 3,
+                    "campaign_id": 1,
+                    "name": "Nova Newsletter",
+                    "slug": "nova-newsletter",
+                    "short_url": "https://lnk.storefront.example/nova-newsletter",
+                    "clicks": 0
+                }
+            ]
+        },
+        "meta": {
+            "from": "2026-01-01",
+            "to": "2026-01-15",
+            "group_by": "day",
+            "timezone": "UTC",
+            "include_bots": false
+        }
+    }
+}

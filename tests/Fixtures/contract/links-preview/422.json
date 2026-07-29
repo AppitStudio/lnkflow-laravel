@@ -1,0 +1,30 @@
+{
+    "endpoint": "links-preview",
+    "case": "Neither campaign_id nor campaign_name, and an invalid destination.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/links/preview",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "The campaign id field is required when campaign name is not present. (and 2 more errors)",
+        "errors": {
+            "campaign_id": [
+                "The campaign id field is required when campaign name is not present."
+            ],
+            "campaign_name": [
+                "The campaign name field is required when campaign id is not present."
+            ],
+            "destination_url": [
+                "The destination url field must be a valid URL."
+            ]
+        }
+    }
+}

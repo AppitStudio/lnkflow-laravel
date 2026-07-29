@@ -1,0 +1,29 @@
+{
+    "endpoint": "track-sale",
+    "case": "Float money and a missing invoice_id.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/track/sale",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "600",
+        "x-ratelimit-remaining": "592"
+    },
+    "body": {
+        "message": "The amount field must be an integer. (and 1 more error)",
+        "errors": {
+            "amount": [
+                "The amount field must be an integer."
+            ],
+            "invoice_id": [
+                "The invoice id field is required."
+            ]
+        }
+    }
+}

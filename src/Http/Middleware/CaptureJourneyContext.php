@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LnkFlow\Laravel\Contracts\ConsentResolver;
+use LnkFlow\Laravel\Data\Consent;
 use LnkFlow\Laravel\Data\ConsentState;
 use LnkFlow\Laravel\Jobs\CaptureTouchpointJob;
 use LnkFlow\Laravel\Services\JourneyContext;
@@ -49,11 +50,11 @@ final readonly class CaptureJourneyContext
             ? $state['visitor_id']
             : (string) Str::uuid();
         $now = now()->toIso8601String();
-        $consent = [
-            'storage' => $storage->value,
-            'ad_user_data' => $this->consent->adUserData($request)->value,
-            'ad_personalization' => $this->consent->adPersonalization($request)->value,
-        ];
+        $consent = (new Consent(
+            storage: $storage,
+            adUserData: $this->consent->adUserData($request),
+            adPersonalization: $this->consent->adPersonalization($request),
+        ))->toArray();
 
         $this->context->replace([
             ...$state,
@@ -66,14 +67,15 @@ final readonly class CaptureJourneyContext
             'consent' => $consent,
         ]);
 
+        $website = config('lnkflow.connections.'.config()->string('lnkflow.default', 'default').'.website');
+        $queue = config('lnkflow.journeys.queue');
+
         CaptureTouchpointJob::dispatch(
             $visitorId,
             $clickId,
-            is_numeric(config('lnkflow.connections.'.config('lnkflow.default').'.website'))
-                ? (int) config('lnkflow.connections.'.config('lnkflow.default').'.website')
-                : null,
+            is_numeric($website) ? (int) $website : null,
             $consent,
-        )->onQueue(config('lnkflow.journeys.queue'))->afterResponse();
+        )->onQueue(is_string($queue) ? $queue : null)->afterResponse();
 
         $response = $next($request);
 

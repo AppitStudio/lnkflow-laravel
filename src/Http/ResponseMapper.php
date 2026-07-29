@@ -13,20 +13,34 @@ use LnkFlow\Laravel\Exceptions\NotFoundException;
 use LnkFlow\Laravel\Exceptions\RateLimitException;
 use LnkFlow\Laravel\Exceptions\ServerException;
 use LnkFlow\Laravel\Exceptions\ValidationException;
+use LnkFlow\Laravel\Support\Shape;
 
 final class ResponseMapper
 {
-    /** @return array<string, mixed> */
-    public function map(Response $response): array
+    /**
+     * Headers retained on a successful response. Everything else is discarded
+     * so that no incidental server detail reaches logs, snapshots, or fixtures.
+     *
+     * @var list<string>
+     */
+    private const RETAINED_HEADERS = [
+        'x-lnkflow-request-id',
+        'idempotent-replayed',
+        'retry-after',
+    ];
+
+    public function map(Response $response): ApiResponse
     {
         if ($response->successful()) {
-            $json = $response->json();
-
-            return is_array($json) ? $json : [];
+            return new ApiResponse(
+                $response->status(),
+                Shape::map($response->json()),
+                $this->headers($response),
+                $response->body(),
+            );
         }
 
-        $json = $response->json();
-        $payload = is_array($json) ? $json : [];
+        $payload = Shape::map($response->json());
         $message = is_string($payload['message'] ?? null)
             ? $payload['message']
             : 'The LnkFlow API request failed.';
@@ -53,6 +67,22 @@ final class ResponseMapper
                 ? new ServerException($message, $status, $requestId, $code, $errors)
                 : new LnkFlowException($message, $status, $requestId, $code, $errors),
         };
+    }
+
+    /** @return array<string, string> */
+    private function headers(Response $response): array
+    {
+        $retained = [];
+
+        foreach (self::RETAINED_HEADERS as $name) {
+            $value = $response->header($name);
+
+            if ($value !== '') {
+                $retained[$name] = $value;
+            }
+        }
+
+        return $retained;
     }
 
     /** @return array<string, list<string>> */

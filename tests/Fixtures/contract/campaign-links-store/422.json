@@ -1,0 +1,26 @@
+{
+    "endpoint": "campaign-links-store",
+    "case": "Slug already used on the same domain.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/campaigns/1/links",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "20",
+        "x-ratelimit-remaining": "6"
+    },
+    "body": {
+        "message": "The slug has already been taken for this domain.",
+        "errors": {
+            "slug": [
+                "The slug has already been taken for this domain."
+            ]
+        }
+    }
+}

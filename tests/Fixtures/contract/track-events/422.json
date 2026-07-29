@@ -1,0 +1,24 @@
+{
+    "endpoint": "track-events",
+    "case": "Unsupported type filter.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/track/events",
+        "query": "type=chargeback",
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "The selected type is invalid.",
+        "errors": {
+            "type": [
+                "The selected type is invalid."
+            ]
+        }
+    }
+}

@@ -1,0 +1,69 @@
+{
+    "endpoint": "links-preview",
+    "case": "Side-effect-free dry run of a link that does not exist yet.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/links/preview",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "short_url": "https://lnk.storefront.example/nova-preview",
+            "default_short_url": "https://contract-fixtures.mylnk.click/nova-preview",
+            "custom_domain_url": "https://lnk.storefront.example/nova-preview",
+            "name": "Nova Preview",
+            "slug": "nova-preview",
+            "destination_url": "https://storefront.example/preview",
+            "destination_url_with_utm": "https://storefront.example/preview?utm_source=youtube&utm_medium=social&utm_campaign=Spring+Launch",
+            "utm_parameters": {
+                "utm_source": "youtube",
+                "utm_medium": "social",
+                "utm_campaign": "Spring Launch"
+            },
+            "selected_domain": {
+                "type": "custom",
+                "source": "campaign_default",
+                "domain": "lnk.storefront.example",
+                "url": "https://lnk.storefront.example",
+                "custom_domain_id": 1
+            },
+            "campaign": {
+                "id": 1,
+                "name": "Spring Launch",
+                "slug": "nova-youtube",
+                "exists": true
+            },
+            "website": {
+                "id": 1,
+                "name": "Storefront",
+                "domain": "storefront.example",
+                "is_active": true
+            },
+            "influencer": {
+                "id": 1,
+                "name": "Nova Rivers",
+                "primary_platform": "youtube",
+                "primary_handle": "novarivers"
+            },
+            "social_platform": "youtube",
+            "is_active": true,
+            "conversion_tracking_enabled": false,
+            "auto_promo_code": null,
+            "warnings": [],
+            "will_create": {
+                "campaign": false,
+                "link": true,
+                "clicks": false,
+                "domain": false,
+                "influencer": false
+            }
+        }
+    }
+}

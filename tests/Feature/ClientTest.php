@@ -6,12 +6,9 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use LnkFlow\Laravel\Data\CreateCampaign;
 use LnkFlow\Laravel\Data\CreateLink;
+use LnkFlow\Laravel\Data\CreateWebsite;
 use LnkFlow\Laravel\Exceptions\ServerException;
 use LnkFlow\Laravel\Services\Client;
-
-beforeEach(function (): void {
-    Http::preventStrayRequests();
-});
 
 it('uses the least privileged token, team header, request id, and idempotency key', function (): void {
     Http::fake([
@@ -65,7 +62,7 @@ it('does not retry a POST without an idempotency guarantee', function (): void {
         ->push(['message' => 'temporary'], 500)
         ->push(['data' => ['id' => 2]], 201);
 
-    expect(fn () => app(Client::class)->websites()->create(['name' => 'No retry']))
+    expect(fn () => app(Client::class)->websites()->create(new CreateWebsite('No retry')))
         ->toThrow(ServerException::class);
     Http::assertSentCount(1);
 });

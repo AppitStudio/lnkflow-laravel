@@ -1,0 +1,57 @@
+{
+    "endpoint": "me",
+    "case": "Token check: identity, capabilities and short-link domain.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/me",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "id": 1,
+            "name": "Ada Fixture",
+            "url_prefix": "contract-fixtures",
+            "timezone": "UTC",
+            "capabilities": {
+                "read": true,
+                "write": true,
+                "conversions": true
+            },
+            "main_domain": "app.lnkflow.io",
+            "link_domain": "mylnk.click",
+            "active_account": {
+                "id": 1,
+                "name": "Contract Fixtures Team",
+                "url_prefix": "contract-fixtures",
+                "link_domain": "mylnk.click"
+            },
+            "active_team": {
+                "id": 1,
+                "name": "Contract Fixtures Team",
+                "url_prefix": "contract-fixtures",
+                "link_domain": "mylnk.click"
+            },
+            "accounts": [
+                {
+                    "id": 1,
+                    "name": "Contract Fixtures Team",
+                    "role": "owner"
+                }
+            ],
+            "teams": [
+                {
+                    "id": 1,
+                    "name": "Contract Fixtures Team",
+                    "role": "owner"
+                }
+            ]
+        }
+    }
+}

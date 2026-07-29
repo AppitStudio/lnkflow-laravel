@@ -94,9 +94,13 @@ final class LnkFlowManager
     {
         $matches = array_filter(
             $this->requests(),
-            static fn (array $request): bool => $request['method'] === mb_strtoupper($method)
-                && ($request['path'] === $path || fnmatch($path, (string) $request['path']))
-                && ($callback === null || $callback($request) === true),
+            static function (array $request) use ($method, $path, $callback): bool {
+                $requestPath = $request['path'] ?? null;
+
+                return $request['method'] === mb_strtoupper($method)
+                    && ($requestPath === $path || (is_string($requestPath) && fnmatch($path, $requestPath)))
+                    && ($callback === null || $callback($request) === true);
+            },
         );
 
         Assert::assertNotEmpty($matches, "Expected a LnkFlow request [{$method} {$path}] was not sent.");

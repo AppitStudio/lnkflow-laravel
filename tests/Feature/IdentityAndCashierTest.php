@@ -131,7 +131,46 @@ it('maps supported Cashier payloads and ignores test mode by default', function 
 
         return $job->businessId === 'invoice_live'
             && $payload['amount'] === 2500
-            && $payload['provider_event_ids']['meta'] === 'evt_live';
+            && $payload['currency'] === 'usd'
+            && $payload['customer_external_id'] === 'cus_opaque'
+            && $payload['payment_processor'] === 'stripe'
+            // `provider_event_ids.meta` is the Meta CAPI deduplication id and
+            // must match the id the browser Pixel sent. A Stripe `evt_...`
+            // never does, so supplying one would break deduplication rather
+            // than provide it — the listener deliberately leaves it unset.
+            && ! array_key_exists('provider_event_ids', $payload);
+    });
+});
+
+it('reports Cashier refunds against the original invoice without a currency', function (): void {
+    Bus::fake();
+    Event::fake();
+    $listener = new CashierWebhookListener(new ConversionDispatcher(identityContext()));
+
+    $listener((object) ['payload' => [
+        'id' => 'evt_refund',
+        'livemode' => true,
+        'type' => 'charge.refunded',
+        'data' => ['object' => [
+            'id' => 'ch_live',
+            'invoice' => 'invoice_live',
+            'refunds' => ['data' => [['id' => 're_live', 'amount' => 500]]],
+        ]],
+    ]]);
+
+    Bus::assertDispatched(SendConversionJob::class, function (SendConversionJob $job): bool {
+        $payload = $job->conversion->toArray();
+
+        return $job->type === 'refund'
+            && $job->businessId === 're_live'
+            && $payload['original_invoice_id'] === 'invoice_live'
+            && $payload['refund_id'] === 're_live'
+            && $payload['amount'] === 500
+            && ! array_key_exists('currency', $payload)
+            // Refunds attribute through the original sale, so no journey
+            // context (visitor/click identifiers) is moved around for them.
+            && ! array_key_exists('visitor_id', $payload)
+            && ! array_key_exists('click_id', $payload);
     });
 });
 

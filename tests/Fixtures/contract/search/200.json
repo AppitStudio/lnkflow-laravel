@@ -1,0 +1,68 @@
+{
+    "endpoint": "search",
+    "case": "Cross-entity search used by the extension omnibox.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/search",
+        "query": "q=nova&limit=5",
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": [
+            {
+                "type": "influencer",
+                "id": 1,
+                "label": "Nova Rivers",
+                "metadata": {
+                    "slug": "nova-rivers",
+                    "primary_platform": "youtube",
+                    "primary_handle": "novarivers",
+                    "is_active": true
+                }
+            },
+            {
+                "type": "link",
+                "id": 1,
+                "label": "Nova YouTube",
+                "metadata": {
+                    "slug": "nova-youtube",
+                    "short_url": "https://lnk.storefront.example/nova-youtube",
+                    "campaign_id": 1,
+                    "campaign_name": "Spring Launch",
+                    "influencer_id": 1,
+                    "influencer_name": "Nova Rivers",
+                    "social_platform": "youtube",
+                    "is_active": true
+                }
+            },
+            {
+                "type": "campaign",
+                "id": 1,
+                "label": "Spring Launch",
+                "metadata": {
+                    "campaign_slug": "nova-youtube",
+                    "website_id": 1,
+                    "website_name": "Storefront",
+                    "is_active": true
+                }
+            }
+        ],
+        "meta": {
+            "q": "nova",
+            "types": [
+                "website",
+                "campaign",
+                "link",
+                "influencer",
+                "domain"
+            ],
+            "limit": 5
+        }
+    }
+}

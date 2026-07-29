@@ -10,6 +10,6 @@ final class IdentityClient extends AbstractClient
 {
     public function me(): Identity
     {
-        return new Identity($this->data($this->transport->send('GET', 'me')));
+        return new Identity($this->transport->send('GET', 'me')->data());
     }
 }

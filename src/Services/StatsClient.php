@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Services;
 
+use LnkFlow\Laravel\Data\ConversionStats;
 use LnkFlow\Laravel\Data\Resource;
 
 final class StatsClient extends AbstractClient
@@ -38,10 +39,19 @@ final class StatsClient extends AbstractClient
         return $this->get('stats/websites', $filters);
     }
 
-    /** @param array<string, scalar|null> $filters */
-    public function conversions(array $filters = []): Resource
+    /**
+     * Conversion analytics.
+     *
+     * Check `->hasConversionData` before rendering: when it is false the
+     * numbers are structural zeros, not measured zeros.
+     *
+     * @param  array<string, scalar|null>  $filters
+     */
+    public function conversions(array $filters = []): ConversionStats
     {
-        return $this->get('stats/conversions', $filters);
+        $response = $this->transport->send('GET', 'stats/conversions', $filters);
+
+        return new ConversionStats($response->data(), $response->meta());
     }
 
     /** @param array<string, scalar|null> $filters */
@@ -59,6 +69,6 @@ final class StatsClient extends AbstractClient
     /** @param array<string, scalar|null> $filters */
     private function get(string $path, array $filters): Resource
     {
-        return new Resource($this->data($this->transport->send('GET', $path, $filters)));
+        return new Resource($this->transport->send('GET', $path, $filters)->data());
     }
 }

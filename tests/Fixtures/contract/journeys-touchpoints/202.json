@@ -1,0 +1,26 @@
+{
+    "endpoint": "journeys-touchpoints",
+    "case": "Unknown or cross-tenant click id: accepted as pending, deliberately indistinguishable.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/journeys/touchpoints",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 202,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "600",
+        "x-ratelimit-remaining": "585"
+    },
+    "body": {
+        "data": {
+            "visitor_id": "20000002-0000-4000-8000-000000000002",
+            "touchpoint_id": null,
+            "resolution_status": "pending",
+            "duplicate": false
+        }
+    }
+}

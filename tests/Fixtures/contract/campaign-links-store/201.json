@@ -1,0 +1,63 @@
+{
+    "endpoint": "campaign-links-store",
+    "case": "Create a tracked link under a campaign.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/campaigns/1/links",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 201,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "20",
+        "x-ratelimit-remaining": "9"
+    },
+    "body": {
+        "data": {
+            "id": 3,
+            "campaign_id": 1,
+            "campaign": {
+                "id": 1,
+                "name": "Spring Launch",
+                "slug": "nova-youtube",
+                "website": {
+                    "id": 1,
+                    "name": "Storefront",
+                    "domain": "storefront.example"
+                }
+            },
+            "name": "Nova Newsletter",
+            "slug": "nova-newsletter",
+            "short_url": "https://lnk.storefront.example/nova-newsletter",
+            "default_short_url": "https://contract-fixtures.mylnk.click/nova-newsletter",
+            "custom_domain_url": "https://lnk.storefront.example/nova-newsletter",
+            "edge_status": "publishing",
+            "edge_published_at": null,
+            "edge_publish_failed_at": null,
+            "custom_domain": {
+                "id": 1,
+                "domain": "lnk.storefront.example",
+                "is_usable": true
+            },
+            "social_platform": "instagram",
+            "destination_url": "https://storefront.example/spring",
+            "destination_url_with_utm": "https://storefront.example/spring?utm_source=instagram&utm_medium=social&utm_campaign=Spring+Launch",
+            "utm_parameters": {
+                "utm_source": "instagram",
+                "utm_medium": "social",
+                "utm_campaign": "Spring Launch"
+            },
+            "integrations": [],
+            "influencer": null,
+            "is_active": true,
+            "conversion_tracking_enabled": true,
+            "auto_promo_code": "NOVA10",
+            "total_clicks": 0,
+            "created_at": "2026-01-15T12:00:00+00:00",
+            "updated_at": "2026-01-15T12:00:00+00:00"
+        }
+    }
+}

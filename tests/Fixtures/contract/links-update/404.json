@@ -1,0 +1,19 @@
+{
+    "endpoint": "links-update",
+    "case": "Link belongs to another team.",
+    "request": {
+        "method": "PATCH",
+        "path": "/api/v1/links/2",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 404,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "No query results for model [App\\Models\\CampaignLink] 2"
+    }
+}

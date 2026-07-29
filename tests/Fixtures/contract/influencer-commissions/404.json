@@ -1,0 +1,19 @@
+{
+    "endpoint": "influencer-commissions",
+    "case": "Influencer belongs to another team.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/influencers/2/commissions",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 404,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "No query results for model [App\\Models\\Influencer] 2"
+    }
+}

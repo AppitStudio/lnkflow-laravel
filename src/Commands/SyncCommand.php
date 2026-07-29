@@ -77,8 +77,10 @@ final class SyncCommand extends Command
             return;
         }
 
+        $queue = config('lnkflow.content.queue');
+
         SyncLinkableContentJob::dispatch($modelClass, $key, (bool) $this->option('force'))
-            ->onQueue(config('lnkflow.content.queue'));
+            ->onQueue(is_string($queue) ? $queue : null);
         $this->line("Queued {$modelClass}:{$key}.");
     }
 }

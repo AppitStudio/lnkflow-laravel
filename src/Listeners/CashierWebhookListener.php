@@ -8,6 +8,18 @@ use LnkFlow\Laravel\Data\Refund;
 use LnkFlow\Laravel\Data\Sale;
 use LnkFlow\Laravel\Services\ConversionDispatcher;
 
+/**
+ * Reports Cashier's Stripe webhooks as LnkFlow conversions.
+ *
+ * Enable this or LnkFlow's own per-team Stripe webhook, never both: they see
+ * the same Stripe events and would each record the sale.
+ *
+ * Note what is deliberately not set here. `provider_event_ids.meta` is the Meta
+ * CAPI event id used to deduplicate a server event against the browser Pixel
+ * event, so it has to match the id the Pixel sent. A Stripe webhook event id
+ * never matches, and supplying one breaks deduplication instead of providing
+ * it — Meta would count every purchase twice.
+ */
 final readonly class CashierWebhookListener
 {
     public function __construct(private ConversionDispatcher $conversions) {}
@@ -22,7 +34,8 @@ final readonly class CashierWebhookListener
         }
 
         $type = $payload['type'] ?? null;
-        $object = $payload['data']['object'] ?? null;
+        $data = $payload['data'] ?? null;
+        $object = is_array($data) ? ($data['object'] ?? null) : null;
 
         if (! is_array($object)) {
             return;
@@ -35,11 +48,11 @@ final readonly class CashierWebhookListener
 
             if (is_string($invoiceId) && is_int($amount) && is_string($currency)) {
                 $this->conversions->sale(new Sale(
-                    $invoiceId,
-                    $amount,
-                    $currency,
-                    is_string($object['customer'] ?? null) ? $object['customer'] : null,
-                    ['provider_event_ids' => ['meta' => $payload['id'] ?? null]],
+                    invoiceId: $invoiceId,
+                    amount: $amount,
+                    currency: $currency,
+                    customerExternalId: is_string($object['customer'] ?? null) ? $object['customer'] : null,
+                    paymentProcessor: 'stripe',
                 ));
             }
 
@@ -48,23 +61,22 @@ final readonly class CashierWebhookListener
 
         if ($type === 'charge.refunded') {
             $invoiceId = $object['invoice'] ?? null;
-            $refunds = $object['refunds']['data'] ?? [];
+            $container = $object['refunds'] ?? null;
+            $refunds = is_array($container) ? ($container['data'] ?? null) : null;
 
             foreach (is_array($refunds) ? $refunds : [] as $refund) {
                 if (! is_array($refund)
                     || ! is_string($invoiceId)
                     || ! is_string($refund['id'] ?? null)
-                    || ! is_int($refund['amount'] ?? null)
-                    || ! is_string($object['currency'] ?? null)) {
+                    || ! is_int($refund['amount'] ?? null)) {
                     continue;
                 }
 
                 $this->conversions->refund(new Refund(
-                    $invoiceId,
-                    $refund['id'],
-                    $refund['amount'],
-                    $object['currency'],
-                    ['provider_event_ids' => ['meta' => $payload['id'] ?? null]],
+                    invoiceId: $invoiceId,
+                    refundId: $refund['id'],
+                    amount: $refund['amount'],
+                    paymentProcessor: 'stripe',
                 ));
             }
         }

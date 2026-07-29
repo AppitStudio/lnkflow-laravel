@@ -8,16 +8,13 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
+use LnkFlow\Laravel\Jobs\Concerns\ReportsApiFailures;
 use LnkFlow\Laravel\Services\ContentSynchronizer;
 
 final class SyncLinkableContentJob implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
-
-    public int $tries = 5;
-
-    /** @var list<int> */
-    public array $backoff = [10, 30, 120, 300];
+    use ReportsApiFailures;
 
     public function __construct(
         public readonly string $modelClass,
@@ -42,6 +39,10 @@ final class SyncLinkableContentJob implements ShouldBeUnique, ShouldQueue
 
     public function handle(ContentSynchronizer $synchronizer): void
     {
-        $synchronizer->sync($this->modelClass, $this->modelKey, $this->force);
+        $this->callApi(fn (): mixed => $synchronizer->sync(
+            $this->modelClass,
+            $this->modelKey,
+            $this->force,
+        ));
     }
 }

@@ -19,12 +19,13 @@ final readonly class ConsentRevocationService
             return false;
         }
 
-        $website = config('lnkflow.connections.'.config('lnkflow.default').'.website');
+        $website = config('lnkflow.connections.'.config()->string('lnkflow.default', 'default').'.website');
+        $queue = config('lnkflow.journeys.queue');
 
         RevokeVisitorJob::dispatch(
             $visitorId,
             is_numeric($website) ? (int) $website : null,
-        )->onQueue(config('lnkflow.journeys.queue'))->afterCommit();
+        )->onQueue(is_string($queue) ? $queue : null)->afterCommit();
 
         return true;
     }

@@ -1,0 +1,19 @@
+{
+    "endpoint": "campaign-links-index",
+    "case": "No bearer token.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/campaigns/1/links",
+        "query": null,
+        "authenticated": false
+    },
+    "status": 401,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "Unauthenticated."
+    }
+}

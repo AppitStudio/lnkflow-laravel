@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Contracts;
 
+use LnkFlow\Laravel\Http\ApiResponse;
+
 interface Transport
 {
     public function forConnection(string $connection): self;
@@ -16,7 +18,6 @@ interface Transport
      * @param  array<string, scalar|null>  $query
      * @param  array<string, mixed>  $json
      * @param  array<string, string>  $headers
-     * @return array<string, mixed>
      */
     public function send(
         string $method,
@@ -25,5 +26,5 @@ interface Transport
         array $json = [],
         array $headers = [],
         ?string $stableBusinessKey = null,
-    ): array;
+    ): ApiResponse;
 }

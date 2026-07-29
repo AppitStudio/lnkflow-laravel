@@ -1,0 +1,75 @@
+{
+    "endpoint": "track-sale",
+    "case": "The same invoice again: idempotent, flagged as a duplicate.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/track/sale",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "600",
+        "x-ratelimit-remaining": "594"
+    },
+    "body": {
+        "data": {
+            "id": 2,
+            "type": "sale",
+            "event_name": "purchase",
+            "amount_cents": 4999,
+            "currency": "usd",
+            "attribution_source": "link",
+            "journey": {
+                "status": null,
+                "version": null,
+                "model": null,
+                "confidence": null,
+                "primary_touchpoint_id": null,
+                "last_touchpoint_id": null,
+                "assist_count": 0,
+                "finalized_at": null
+            },
+            "acquisition_source": {
+                "campaign_click_id": 1,
+                "link_id": 1,
+                "campaign_id": 1,
+                "influencer_id": 1
+            },
+            "marketing_attribution": {
+                "influencer_id": 1,
+                "primary": null,
+                "last": null
+            },
+            "commission_attribution": {
+                "influencer_id": 1,
+                "source": "link",
+                "promo_code_id": null
+            },
+            "is_test": false,
+            "is_suspected_bot": false,
+            "fraud_flags": [],
+            "occurred_at": "2026-01-15T12:00:00+00:00",
+            "link": {
+                "id": 1,
+                "name": "Nova YouTube"
+            },
+            "campaign": {
+                "id": 1,
+                "name": "Spring Launch"
+            },
+            "influencer": {
+                "id": 1,
+                "name": "Nova Rivers"
+            },
+            "customer": {
+                "external_id": "cus_contract_fixture",
+                "email": null
+            }
+        },
+        "duplicate": true
+    }
+}

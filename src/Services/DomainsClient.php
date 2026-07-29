@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Services;
 
-use LnkFlow\Laravel\Data\Resource;
+use LnkFlow\Laravel\Data\Domain;
 
 final class DomainsClient extends AbstractClient
 {
-    /** @return list<resource> */
+    /**
+     * @param  bool  $usable  restrict to domains that can actually serve links today
+     * @return list<Domain>
+     */
     public function list(bool $usable = false): array
     {
         return array_map(
-            fn (array $item): Resource => new Resource($item),
-            $this->collection($this->transport->send('GET', 'domains', ['usable' => $usable])),
+            static fn (array $item): Domain => new Domain($item),
+            $this->transport->send('GET', 'domains', ['usable' => $usable])->collection(),
         );
     }
 }

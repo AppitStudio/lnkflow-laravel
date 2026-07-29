@@ -1,0 +1,141 @@
+{
+    "endpoint": "stats-conversions",
+    "case": "Conversion funnel, series and source split.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/stats/conversions",
+        "query": "from=2026-01-01&to=2026-01-15",
+        "authenticated": true
+    },
+    "status": 200,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "funnel": {
+                "clicks": 1,
+                "leads": 1,
+                "sales": 1,
+                "revenue_cents": 0,
+                "rates": {
+                    "click_to_lead": 100,
+                    "lead_to_sale": 100,
+                    "click_to_sale": 100
+                }
+            },
+            "series": [
+                {
+                    "period": "2026-01-01",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-02",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-03",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-04",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-05",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-06",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-07",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-08",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-09",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-10",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-11",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-12",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-13",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-14",
+                    "leads": 0,
+                    "sales": 0,
+                    "revenue_cents": 0
+                },
+                {
+                    "period": "2026-01-15",
+                    "leads": 1,
+                    "sales": 1,
+                    "revenue_cents": 0
+                }
+            ],
+            "source_split": {
+                "link": 2,
+                "code": 0,
+                "manual": 0,
+                "code_share_percent": 0
+            },
+            "has_conversion_data": true,
+            "journey": {
+                "statuses": [],
+                "influence": []
+            }
+        },
+        "meta": {
+            "from": "2026-01-01",
+            "to": "2026-01-15",
+            "timezone": "UTC",
+            "include_bots": false,
+            "filters": []
+        }
+    }
+}

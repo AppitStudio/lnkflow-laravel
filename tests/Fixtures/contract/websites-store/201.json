@@ -1,0 +1,27 @@
+{
+    "endpoint": "websites-store",
+    "case": "Create a website.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/websites",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 201,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "data": {
+            "id": 3,
+            "name": "Docs Site",
+            "domain": "docs.example",
+            "description": null,
+            "default_custom_domain": null,
+            "is_active": true,
+            "created_at": "2026-01-15T12:00:00+00:00"
+        }
+    }
+}

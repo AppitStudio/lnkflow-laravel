@@ -7,24 +7,23 @@ namespace LnkFlow\Laravel\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use LnkFlow\Laravel\Contracts\Payload;
-use LnkFlow\Laravel\Data\Lead;
-use LnkFlow\Laravel\Data\NamedEvent;
-use LnkFlow\Laravel\Data\Refund;
-use LnkFlow\Laravel\Data\Sale;
 use LnkFlow\Laravel\Events\ConversionFailed;
 use LnkFlow\Laravel\Events\ConversionSent;
+use LnkFlow\Laravel\Jobs\Concerns\ReportsApiFailures;
 use LnkFlow\Laravel\Services\Client;
-use LogicException;
 use Throwable;
 
+/**
+ * Reports one conversion, after the host transaction committed.
+ *
+ * The payload is sent exactly as it was built at dispatch time. Rebuilding it
+ * here would discard the journey context captured in the request that produced
+ * the conversion, which is the only place that context exists.
+ */
 final class SendConversionJob implements ShouldQueue
 {
     use Queueable;
-
-    public int $tries = 5;
-
-    /** @var list<int> */
-    public array $backoff = [10, 30, 120, 300];
+    use ReportsApiFailures;
 
     public function __construct(
         public readonly string $type,
@@ -34,15 +33,11 @@ final class SendConversionJob implements ShouldQueue
 
     public function handle(Client $client): void
     {
-        $remote = match (true) {
-            $this->conversion instanceof NamedEvent => $client->conversions()->event($this->conversion),
-            $this->conversion instanceof Lead => $client->conversions()->lead($this->conversion),
-            $this->conversion instanceof Sale => $client->conversions()->sale($this->conversion),
-            $this->conversion instanceof Refund => $client->conversions()->refund($this->conversion),
-            default => throw new LogicException('Unsupported LnkFlow conversion payload.'),
-        };
+        $this->callApi(function () use ($client): void {
+            $remote = $client->conversions()->send($this->type, $this->conversion, $this->businessId);
 
-        event(new ConversionSent($this->type, $this->businessId, $remote->id));
+            event(new ConversionSent($this->type, $this->businessId, $remote->id));
+        });
     }
 
     public function failed(?Throwable $exception): void

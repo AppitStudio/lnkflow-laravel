@@ -18,6 +18,10 @@ final readonly class ConversionMapperRegistry
 
     public function map(object $event): bool
     {
+        if (config('lnkflow.features.conversions') !== true) {
+            return false;
+        }
+
         $mappers = config('lnkflow.conversions.mappers', []);
 
         foreach (is_array($mappers) ? $mappers : [] as $mapperClass) {

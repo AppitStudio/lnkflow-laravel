@@ -1,0 +1,19 @@
+{
+    "endpoint": "influencers-store",
+    "case": "A read-only token cannot write.",
+    "request": {
+        "method": "POST",
+        "path": "/api/v1/influencers",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 403,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "This token is read-only. Create one with write access in LnkFlow → Settings → API Tokens."
+    }
+}

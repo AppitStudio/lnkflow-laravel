@@ -15,11 +15,14 @@ final readonly class Identity extends ApiObject
     public function __construct(array $raw)
     {
         parent::__construct($raw);
-        $this->id = (int) ($raw['id'] ?? 0);
-        $capabilities = $raw['capabilities'] ?? [];
-        $this->capabilities = is_array($capabilities)
-            ? array_map(static fn (mixed $value): bool => (bool) $value, $capabilities)
-            : [];
+        $this->id = self::int($raw['id'] ?? null) ?? 0;
+        $capabilities = [];
+
+        foreach (self::map($raw['capabilities'] ?? null) as $ability => $granted) {
+            $capabilities[$ability] = (bool) $granted;
+        }
+
+        $this->capabilities = $capabilities;
     }
 
     public function can(string $ability): bool

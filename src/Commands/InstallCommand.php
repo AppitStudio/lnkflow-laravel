@@ -17,13 +17,14 @@ final class InstallCommand extends Command
 
     /** @var array<string, array<string, bool>> */
     private const PRESETS = [
+        // Manual client calls need no feature flag; `client` and `links` are
+        // guidance presets that publish config and print the right env vars.
         'client' => [],
-        'links' => ['links' => true],
-        'content' => ['links' => true, 'content' => true],
+        'links' => [],
+        'content' => ['content' => true],
         'journeys' => ['journeys' => true, 'auth_identity' => true],
         'conversions' => ['conversions' => true],
         'full' => [
-            'links' => true,
             'content' => true,
             'journeys' => true,
             'auth_identity' => true,
@@ -69,6 +70,8 @@ final class InstallCommand extends Command
 
         if (in_array($preset, ['journeys', 'full'], true)) {
             $this->warn('Bind ConsentResolver before capture. Unknown consent stores and sends nothing.');
+            $this->line('  Add CaptureJourneyContext to the web middleware group by hand, and render');
+            $this->line('  <x-lnkflow-script /> once LNKFLOW_SITE_KEY is set.');
         }
 
         $this->line('Cashier remains disabled. Choose it explicitly only if the direct LnkFlow Stripe webhook is not reporting the same transactions.');
@@ -85,7 +88,6 @@ final class InstallCommand extends Command
         }
 
         $features = [
-            'links' => false,
             'content' => false,
             'journeys' => false,
             'auth_identity' => false,

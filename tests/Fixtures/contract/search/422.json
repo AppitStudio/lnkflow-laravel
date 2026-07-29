@@ -1,0 +1,24 @@
+{
+    "endpoint": "search",
+    "case": "The required q parameter is missing.",
+    "request": {
+        "method": "GET",
+        "path": "/api/v1/search",
+        "query": null,
+        "authenticated": true
+    },
+    "status": 422,
+    "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-cache, private",
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+    },
+    "body": {
+        "message": "The q field is required.",
+        "errors": {
+            "q": [
+                "The q field is required."
+            ]
+        }
+    }
+}

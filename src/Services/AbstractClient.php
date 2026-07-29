@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace LnkFlow\Laravel\Services;
 
+use Closure;
 use LnkFlow\Laravel\Contracts\Transport;
+use LnkFlow\Laravel\Data\Page;
 
 abstract class AbstractClient
 {
     public function __construct(protected readonly Transport $transport) {}
 
     /**
-     * @param  array<string, mixed>  $payload
-     * @return array<string, mixed>
+     * Fetch one page and hand it a resolver so callers can walk the rest with
+     * `->next()` or `->each()` instead of re-implementing paging.
+     *
+     * @template TItem
+     *
+     * @param  array<string, scalar|null>  $filters
+     * @param  Closure(array<string, mixed>): TItem  $factory
+     * @return Page<TItem>
      */
-    protected function data(array $payload): array
+    protected function paginate(string $path, array $filters, Closure $factory): Page
     {
-        $data = $payload['data'] ?? [];
+        $response = $this->transport->send('GET', $path, $filters);
 
-        return is_array($data) ? $data : [];
-    }
-
-    /**
-     * @param  array<string, mixed>  $payload
-     * @return list<array<string, mixed>>
-     */
-    protected function collection(array $payload): array
-    {
-        $data = $payload['data'] ?? [];
-
-        return is_array($data)
-            ? array_values(array_filter($data, is_array(...)))
-            : [];
+        return new Page(
+            array_map($factory, $response->collection()),
+            $response->meta(),
+            $response->links(),
+            fn (int $page): Page => $this->paginate($path, [...$filters, 'page' => $page], $factory),
+        );
     }
 }
