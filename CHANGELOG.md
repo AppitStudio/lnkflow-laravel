@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- `connections.*.throttle.budgets.default` is **60** instead of `null`. It was
+  null honestly: the server defined a general `throttle:api` limiter and wired
+  it to no route, so reads really were uncapped. The server now applies it to
+  every authenticated endpoint, so the client-side budget mirrors a real limit
+  again. Conversion and journey writes keep their own 600/min budget and are
+  not affected.
 
 ## [0.1.0] - unreleased
 

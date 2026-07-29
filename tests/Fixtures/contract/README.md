@@ -73,7 +73,7 @@ Each file:
     "x-ratelimit-limit": "20",
     "x-ratelimit-remaining": "0"
   },
-  "body": { "message": "Too Many Attempts." }
+  "body": { "message": "Too Many Attempts.", "code": "RATE_LIMITED" }
 }
 ```
 
@@ -90,7 +90,7 @@ Only headers that change client behaviour are recorded:
 | `cache-control` | `browser-extension-bootstrap` is the only cacheable response |
 | `x-lnkflow-request-id` | correlation id — always present, always normalised here |
 | `retry-after` | present on `429`; authoritative over any client backoff |
-| `x-ratelimit-limit`, `x-ratelimit-remaining` | present on the throttled create routes |
+| `x-ratelimit-limit`, `x-ratelimit-remaining` | present on every throttled route, which is now all of them |
 | `idempotent-replayed` | `true` when a create was replayed from a stored response |
 
 Everything else (`Date`, `Content-Length`, `Set-Cookie`, …) is dropped as
@@ -168,7 +168,7 @@ would be worse than omitting it. What is missing, and why:
 | `404` | every collection route and every route without a path parameter (`campaigns-index`, `websites-index`, `links-preview`, `stats/*`, `track/*`, `journeys/touchpoints`, `me`, `search`, `domains`, `browser-extension/bootstrap`) | There is no resource to miss. Cross-tenant access to a *collection* returns an empty page, not `404`. |
 | `409` | everything except `campaigns-store` | `409 IDEMPOTENCY_IN_PROGRESS` is emitted only by `EnsureIdempotentApiRequest`, which is applied to exactly two routes: `POST /campaigns` and `POST /campaigns/{id}/links`. Both behave identically, so only the campaign route is recorded. |
 | `422` | `campaigns-index`, `campaigns-show`, `links-show`, `websites-index/show`, `influencers-index/show`, `influencer-commissions`, `domains-index`, `browser-extension/bootstrap`, `stats/conversions` | These take no validated input beyond pagination, which coerces rather than rejects. |
-| `429` | everything except `campaigns-store` | **Only four route groups are throttled at all**: `throttle:link-creation` (20/min per user) on the two create routes, `throttle:conversion-tracking` (600/min per team) on `track/*`, and `throttle:journey-capture` (600/min per team) on `journeys/*`. Every read endpoint — the whole of `campaigns`, `links`, `websites`, `influencers`, `domains`, `stats`, `search`, `me` — carries **no rate limiter**. The 600/min budgets are not practically reachable from a generator, so `campaigns-store/429.json` is the single representative. |
+| `429` | everything except `campaigns-store` | Every v1 route is throttled now, but only one budget is small enough to reach from a generator. `throttle:link-creation` is 20/min per user on the two create routes; the general `throttle:api` budget is 60/min per token on everything else; `throttle:conversion-tracking` and `throttle:journey-capture` are 600/min per team. So `campaigns-store/429.json` is the single representative, and the reads instead record the `x-ratelimit-limit` / `x-ratelimit-remaining` headers they now carry. |
 | `5xx` | everywhere | Not synthesisable from a healthy application. SDKs must still treat `5xx` as retryable per `PRPs/integrations/base-context.md`. |
 | `204` | everywhere | `DELETE /campaigns/{id}` and `DELETE /links/{id}` return it, but integrations deactivate (`is_active=false`) rather than delete — see `base-context.md`. Not part of the corpus. |
 

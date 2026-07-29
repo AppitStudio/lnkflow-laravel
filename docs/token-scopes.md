@@ -111,12 +111,18 @@ This propagates:
 
 ## Rate limits
 
-- 60 requests/minute per token for the general API. The optional client-side
-  throttle (`connections.*.throttle`) tries to stay inside that budget and
-  deliberately fails open — if the budget is exhausted for longer than
-  `max_wait_milliseconds`, the request still goes out and the server's 429 plus
-  `Retry-After` becomes the authority.
-- 600 requests/minute per team for the conversion-tracking writes.
+- 60 requests/minute per token for the general API — reads and resource
+  management — with a 300/minute per-user backstop across a user's tokens. The
+  optional client-side throttle (`connections.*.throttle`) tries to stay inside
+  the per-token budget and deliberately fails open: if it is exhausted for
+  longer than `max_wait_milliseconds`, the request still goes out and the
+  server's 429 plus `Retry-After` becomes the authority. It cannot model the
+  per-user backstop, which spans clients this SDK cannot see.
+- 20 creates/minute per user on campaign and link creation. This is the one a
+  CMS backfill actually hits.
+- 600 requests/minute per team for the conversion and journey writes. Those do
+  **not** also carry the general 60/minute budget — reporting sales at volume is
+  not meant to be capped at 60.
 
 ## Handling tokens
 
