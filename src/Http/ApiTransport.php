@@ -227,7 +227,11 @@ final class ApiTransport implements Transport
     {
         $url = $settings['url'] ?? null;
 
-        return mb_rtrim(is_string($url) ? $url : '', '/').'/'.mb_ltrim($path, '/');
+        // Native trim, not mb_trim: the needle is a single ASCII byte, so there
+        // is nothing multibyte to get wrong — and mb_ltrim/mb_rtrim are PHP 8.4
+        // functions that this package, which supports 8.2, would be reaching for
+        // through a polyfill it does not depend on directly.
+        return rtrim(is_string($url) ? $url : '', '/').'/'.ltrim($path, '/');
     }
 
     /** @param array<string, string> $headers */
@@ -408,7 +412,7 @@ final class ApiTransport implements Transport
 
     private function isCreate(string $path): bool
     {
-        $path = mb_trim($path, '/');
+        $path = trim($path, '/');
 
         return $path === 'campaigns' || preg_match('#^campaigns/\\d+/links$#', $path) === 1;
     }
