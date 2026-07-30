@@ -7,19 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+## [0.1.0-beta.1] - 2026-07-30
 
-- `connections.*.throttle.budgets.default` is **60** instead of `null`. It was
-  null honestly: the server defined a general `throttle:api` limiter and wired
-  it to no route, so reads really were uncapped. The server now applies it to
-  every authenticated endpoint, so the client-side budget mirrors a real limit
-  again. Conversion and journey writes keep their own 600/min budget and are
-  not affected.
-
-## [0.1.0] - unreleased
-
-The first release. No version has been published to Packagist, so everything
-below is the initial surface rather than a delta from a shipped version.
+The first public beta. Everything below is the initial package surface rather
+than a delta from a previously published version.
 
 Entries marked **breaking** changed after the package's first commit and before
 this release. They matter only if you have been tracking the `main` branch;
@@ -93,6 +84,12 @@ they are called out because working code exists against the earlier shapes.
 
 ### Changed
 
+- `connections.*.throttle.budgets.default` is **60** instead of `null`. It was
+  null honestly: the server defined a general `throttle:api` limiter and wired
+  it to no route, so reads really were uncapped. The server now applies it to
+  every authenticated endpoint, so the client-side budget mirrors a real limit
+  again. Conversion and journey writes keep their own 600/min budget and are
+  not affected.
 - Static analysis runs at **PHPStan level 10** (was level 7, despite being
   described as level 10). Raising it surfaced the unbounded-timeout defect
   listed under Fixed; the other 81 findings were type-narrowing noise.
@@ -211,4 +208,5 @@ they are called out because working code exists against the earlier shapes.
 - Consent defaults to `unknown`, which stores nothing and sends nothing until a
   host binds its own `ConsentResolver`.
 
-[Unreleased]: https://github.com/AppitStudio/lnkflow-laravel/compare/main...HEAD
+[Unreleased]: https://github.com/AppitStudio/lnkflow-laravel/compare/v0.1.0-beta.1...HEAD
+[0.1.0-beta.1]: https://github.com/AppitStudio/lnkflow-laravel/releases/tag/v0.1.0-beta.1

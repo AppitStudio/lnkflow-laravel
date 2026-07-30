@@ -20,7 +20,7 @@ use Throwable;
 
 final class ApiTransport implements Transport
 {
-    public const VERSION = '0.1.0-dev';
+    public const VERSION = '0.1.0-beta.1';
 
     /** @param array<string, mixed> $config */
     public function __construct(

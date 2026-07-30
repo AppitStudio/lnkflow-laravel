@@ -34,8 +34,11 @@ API v1.
 
 ## Install
 
+This package is currently in public beta. Pin the beta explicitly while the
+`0.1` API is validated in real applications:
+
 ```bash
-composer require lnkflow/laravel
+composer require lnkflow/laravel:0.1.0-beta.1
 php artisan lnkflow:install --preset=client
 php artisan migrate
 php artisan lnkflow:doctor

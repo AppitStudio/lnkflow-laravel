@@ -31,9 +31,11 @@ release where practical.
 
 ## While `0.x` is pre-release
 
-No version has been published yet. Until `0.1.0` is tagged, the public PHP
-surface may change without a deprecation window; the compatibility promises
-above describe the intent, and become binding at the first release.
+The `0.1.0-beta.*` line is for controlled validation in real applications.
+During the beta, the public PHP surface may still change without a deprecation
+window. Pin an exact beta version in host applications, read the changelog
+before updating, and report compatibility findings before promoting the package
+to stable `0.1.0`.
 
 ## When the API changes
 
