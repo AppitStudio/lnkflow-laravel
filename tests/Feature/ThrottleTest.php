@@ -180,3 +180,23 @@ it('fails open when the configured cache store does not exist', function (): voi
     expect(app(Client::class)->campaigns()->create(new CreateCampaign('Summer Launch'), 'k')->id)->toBe(3);
     Http::assertSentCount(1);
 });
+
+/**
+ * The shipped budgets exist to mirror the server's named limiters, so a wrong
+ * number here is worse than no number: it throttles a caller for a limit the
+ * API does not have, and that surfaces as unexplained slowness rather than as
+ * a 429 anyone can diagnose.
+ *
+ * `default` was null until 2026-07 because the server's `throttle:api` limiter
+ * was defined and wired to no route. It is wired now.
+ */
+it('ships budgets that mirror the server limiters', function (): void {
+    $config = require __DIR__.'/../../config/lnkflow.php';
+
+    expect($config['connections']['default']['throttle']['budgets'])->toBe([
+        'default' => 60,        // throttle:api, 60/min per token
+        'link_creation' => 20,  // throttle:link-creation, 20/min per user
+        'conversions' => 600,   // throttle:conversion-tracking, 600/min per team
+        'journeys' => 600,      // throttle:journey-capture, 600/min per team
+    ]);
+});

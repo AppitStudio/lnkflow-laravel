@@ -17,6 +17,7 @@
     },
     "body": {
         "message": "The slug field format is invalid.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "slug": [
                 "The slug field format is invalid."

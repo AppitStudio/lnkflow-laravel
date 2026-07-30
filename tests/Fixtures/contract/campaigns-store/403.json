@@ -16,6 +16,7 @@
         "x-ratelimit-remaining": "18"
     },
     "body": {
-        "message": "This token is read-only. Create one with write access in LnkFlow → Settings → API Tokens."
+        "message": "This token is read-only. Create one with write access in LnkFlow → Settings → API Tokens.",
+        "code": "TOKEN_MISSING_ABILITY"
     }
 }

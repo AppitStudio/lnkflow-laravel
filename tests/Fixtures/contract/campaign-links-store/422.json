@@ -17,6 +17,7 @@
     },
     "body": {
         "message": "The slug has already been taken for this domain.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "slug": [
                 "The slug has already been taken for this domain."

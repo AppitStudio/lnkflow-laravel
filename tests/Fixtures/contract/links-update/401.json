@@ -14,6 +14,7 @@
         "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
     },
     "body": {
-        "message": "Unauthenticated."
+        "message": "Unauthenticated.",
+        "code": "UNAUTHENTICATED"
     }
 }

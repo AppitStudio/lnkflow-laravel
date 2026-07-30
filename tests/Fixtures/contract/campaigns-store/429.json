@@ -17,6 +17,7 @@
         "x-ratelimit-remaining": "0"
     },
     "body": {
-        "message": "Too Many Attempts."
+        "message": "Too Many Attempts.",
+        "code": "RATE_LIMITED"
     }
 }

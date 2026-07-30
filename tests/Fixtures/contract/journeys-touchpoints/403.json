@@ -16,6 +16,7 @@
         "x-ratelimit-remaining": "584"
     },
     "body": {
-        "message": "This token cannot track conversions. Create one with conversion access in LnkFlow → Settings → API Tokens."
+        "message": "This token cannot track conversions. Create one with conversion access in LnkFlow → Settings → API Tokens.",
+        "code": "TOKEN_MISSING_ABILITY"
     }
 }

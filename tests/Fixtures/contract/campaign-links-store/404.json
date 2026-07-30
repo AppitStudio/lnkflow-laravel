@@ -16,6 +16,7 @@
         "x-ratelimit-remaining": "7"
     },
     "body": {
-        "message": "No query results for model [App\\Models\\Campaign] 2"
+        "message": "Resource not found.",
+        "code": "NOT_FOUND"
     }
 }

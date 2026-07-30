@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- `connections.*.throttle.budgets.default` is **60** instead of `null`. It was
+  null honestly: the server defined a general `throttle:api` limiter and wired
+  it to no route, so reads really were uncapped. The server now applies it to
+  every authenticated endpoint, so the client-side budget mirrors a real limit
+  again. Conversion and journey writes keep their own 600/min budget and are
+  not affected.
 
 ## [0.1.0] - unreleased
 
@@ -27,6 +34,13 @@ they are called out because working code exists against the earlier shapes.
 - **`Http\ApiResponse`** — a first-class successful response with `status`,
   `body`, retained `headers`, raw `contents`, and `data()`, `collection()`,
   `meta()`, `links()`, `header()`, `requestId()`, `replayed()`.
+- **`Exceptions\ErrorCode`** — the API's machine-readable `code` as a backed
+  enum, plus `LnkFlowException::code()` and `::is(ErrorCode ...)`. Branch on
+  these instead of on `getMessage()`: a 403 for a read-only *token* and a 403
+  for a read-only *role* need different fixes and were previously
+  indistinguishable without matching English prose. An unrecognised code from a
+  newer server yields `null` from `code()` while `errorCode` keeps the raw
+  string, so an older SDK release keeps working.
 - **New read models**: `Website`, `Influencer`, `Domain`, `Commission`,
   `ConversionEvent`, `ConversionStats` (with `hasConversionData`), `SearchMatch`,
   and `Workspace`. `Link` and `Campaign` are now fully typed rather than raw

@@ -17,6 +17,7 @@
     },
     "body": {
         "message": "The customer external id field is required.",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "customer_external_id": [
                 "The customer external id field is required."

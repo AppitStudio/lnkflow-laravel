@@ -51,13 +51,21 @@ return [
                 'enabled' => env('LNKFLOW_THROTTLE', true),
                 'max_wait_milliseconds' => 2000,
                 'store' => null,
-                // null means "no client-side limit", which is the honest
-                // default for endpoints the server does not throttle. Do not
-                // invent a budget here: an imposed limit the server does not
-                // have shows up as unexplained slowness, not as protection.
+                // null means "no client-side limit". Only use it for an
+                // endpoint the server genuinely does not throttle: an imposed
+                // budget the server does not have shows up as unexplained
+                // slowness, not as protection.
                 'budgets' => [
-                    // Reads carry no server-side limiter today.
-                    'default' => null,
+                    // `throttle:api`, 60/min per token — the general budget on
+                    // every authenticated read and on resource management. It
+                    // was null here while the server had the limiter defined
+                    // but wired to no route; that was fixed in 2026-07.
+                    //
+                    // The server also applies a 300/min per-user backstop
+                    // across a user's tokens, which this cannot model: the SDK
+                    // knows its own connection, not the user's other clients.
+                    // The server's 429 remains the authority.
+                    'default' => 60,
                     // `throttle:link-creation`, 20/min per user. This is the
                     // one that a CMS backfill actually hits.
                     'link_creation' => 20,

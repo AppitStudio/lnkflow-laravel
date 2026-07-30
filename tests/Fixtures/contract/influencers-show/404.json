@@ -11,9 +11,12 @@
     "headers": {
         "content-type": "application/json",
         "cache-control": "no-cache, private",
-        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000"
+        "x-lnkflow-request-id": "00000000-0000-4000-8000-000000000000",
+        "x-ratelimit-limit": "60",
+        "x-ratelimit-remaining": "22"
     },
     "body": {
-        "message": "No query results for model [App\\Models\\Influencer] 2"
+        "message": "Resource not found.",
+        "code": "NOT_FOUND"
     }
 }

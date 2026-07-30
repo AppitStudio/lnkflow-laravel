@@ -73,7 +73,7 @@ Each file:
     "x-ratelimit-limit": "20",
     "x-ratelimit-remaining": "0"
   },
-  "body": { "message": "Too Many Attempts." }
+  "body": { "message": "Too Many Attempts.", "code": "RATE_LIMITED" }
 }
 ```
 
@@ -90,7 +90,7 @@ Only headers that change client behaviour are recorded:
 | `cache-control` | `browser-extension-bootstrap` is the only cacheable response |
 | `x-lnkflow-request-id` | correlation id — always present, always normalised here |
 | `retry-after` | present on `429`; authoritative over any client backoff |
-| `x-ratelimit-limit`, `x-ratelimit-remaining` | present on the throttled create routes |
+| `x-ratelimit-limit`, `x-ratelimit-remaining` | present on every throttled route, which is now all of them |
 | `idempotent-replayed` | `true` when a create was replayed from a stored response |
 
 Everything else (`Date`, `Content-Length`, `Set-Cookie`, …) is dropped as
@@ -168,7 +168,7 @@ would be worse than omitting it. What is missing, and why:
 | `404` | every collection route and every route without a path parameter (`campaigns-index`, `websites-index`, `links-preview`, `stats/*`, `track/*`, `journeys/touchpoints`, `me`, `search`, `domains`, `browser-extension/bootstrap`) | There is no resource to miss. Cross-tenant access to a *collection* returns an empty page, not `404`. |
 | `409` | everything except `campaigns-store` | `409 IDEMPOTENCY_IN_PROGRESS` is emitted only by `EnsureIdempotentApiRequest`, which is applied to exactly two routes: `POST /campaigns` and `POST /campaigns/{id}/links`. Both behave identically, so only the campaign route is recorded. |
 | `422` | `campaigns-index`, `campaigns-show`, `links-show`, `websites-index/show`, `influencers-index/show`, `influencer-commissions`, `domains-index`, `browser-extension/bootstrap`, `stats/conversions` | These take no validated input beyond pagination, which coerces rather than rejects. |
-| `429` | everything except `campaigns-store` | **Only four route groups are throttled at all**: `throttle:link-creation` (20/min per user) on the two create routes, `throttle:conversion-tracking` (600/min per team) on `track/*`, and `throttle:journey-capture` (600/min per team) on `journeys/*`. Every read endpoint — the whole of `campaigns`, `links`, `websites`, `influencers`, `domains`, `stats`, `search`, `me` — carries **no rate limiter**. The 600/min budgets are not practically reachable from a generator, so `campaigns-store/429.json` is the single representative. |
+| `429` | everything except `campaigns-store` | Every v1 route is throttled now, but only one budget is small enough to reach from a generator. `throttle:link-creation` is 20/min per user on the two create routes; the general `throttle:api` budget is 60/min per token on everything else; `throttle:conversion-tracking` and `throttle:journey-capture` are 600/min per team. So `campaigns-store/429.json` is the single representative, and the reads instead record the `x-ratelimit-limit` / `x-ratelimit-remaining` headers they now carry. |
 | `5xx` | everywhere | Not synthesisable from a healthy application. SDKs must still treat `5xx` as retryable per `PRPs/integrations/base-context.md`. |
 | `204` | everywhere | `DELETE /campaigns/{id}` and `DELETE /links/{id}` return it, but integrations deactivate (`is_active=false`) rather than delete — see `base-context.md`. Not part of the corpus. |
 
@@ -190,17 +190,22 @@ expect(fn () => $client->campaigns()->create($payload))
     ->and($exception->requestId)->toBe($fixture['headers']['x-lnkflow-request-id']);
 ```
 
-**npm MCP installer / stdio adapter** (`integrations/lnkflow-mcp-server`) — vendor
-or submodule the directory and feed it to a `fetch` mock; iterate `index.json` so
-a newly recorded status fails the suite until it is mapped.
+**npm MCP installer / stdio adapter** (`integrations/lnkflow-mcp-server`) — reads
+this directory **in place** (`tests/contract-corpus.ts`) and replays each fixture
+through a local HTTP server in `tests/contract.test.ts`. It does not vendor a
+copy: it is the one integration tracked inside this repository, so the corpus is
+always three directories up, and a committed copy would be 99 duplicated files in
+one git history guarded against a problem that cannot occur. If it is ever split
+out, vendor it then.
 
 **Hosted MCP server** (`app/Mcp/Servers/LnkFlowServer.php`) — it dispatches
 in-process through `McpApiGateway`, so it does not need a transport fake, but its
 tool-level error mapping should be asserted against the same bodies.
 
-**Chrome extension** (`integrations/lnkflow-browser-extension`) — `popup/api.js`
-has its own status mapping; drive it from these files in the extension's Jest/Vitest
-suite rather than from hand-written JSON.
+**Chrome extension** (`integrations/lnkflow-browser-extension`) — vendors a
+verbatim copy at `tests/fixtures/contract/` and drives every recorded failure
+through the real `popup/api.js` in `tests/contract.spec.cjs`, which also compares
+the copy byte for byte against this directory whenever this checkout is present.
 
 For all four, the rule from `docs/integrations/conformance-checklist.md` §3 holds:
 one fixture per error class, asserting the exception **type**, `status`, `errors`,
@@ -208,19 +213,23 @@ one fixture per error class, asserting the exception **type**, `status`, `errors
 
 ## Contract notes surfaced by the corpus
 
-Reading the recorded bodies side by side makes two inconsistencies obvious. Both
-are described here rather than silently smoothed over in the fixtures:
+Reading the recorded bodies side by side is what surfaced two inconsistencies
+that have since been fixed. Both are worth knowing, because the *shape* of the
+fix is the contract:
 
-1. **Only the idempotency middleware emits a machine-readable `code`.**
-   `409`/`422` from `EnsureIdempotentApiRequest` carry
-   `{"message": …, "code": "IDEMPOTENCY_IN_PROGRESS" | "IDEMPOTENCY_KEY_REUSED" |
-   "INVALID_IDEMPOTENCY_KEY"}`. Every other error — `401`, `403`, `404`, ordinary
-   `422`, `429` — carries `message` (plus `errors` for validation) and no `code`.
-   Clients therefore cannot switch on a stable symbol outside idempotency.
-2. **`404` leaks the internal model class.** Cross-tenant reads return
-   `"No query results for model [App\\Models\\Campaign] 2"`. That is the correct
-   *status* (a tenancy boundary must be indistinguishable from a missing row), but
-   the message exposes internals and must never be parsed or shown to end users.
+1. **Every error carries a machine-readable `code`.** It used to be only the
+   idempotency middleware; `401`, `403`, `404`, ordinary `422` and `429` carried
+   prose and nothing else, so a client had to string-match English to tell a
+   read-only *token* from a read-only *role*. `App\Exceptions\Api\ApiErrorCode`
+   is now the single source of those symbols and
+   `App\Exceptions\Api\ApiExceptionRenderer` puts one on every `/api/*` failure.
+   Assert on `code`; never assert on `message`, which is prose and gets reworded.
+2. **`404` no longer names the model class.** Cross-tenant reads used to return
+   `"No query results for model [App\\Models\\Campaign] 2"` — the right *status*
+   (a tenancy boundary must be indistinguishable from a missing row) with a body
+   that gave the boundary away. It is now `"Resource not found."` with
+   `code=NOT_FOUND`, byte-identical to a genuinely missing id. The corpus has
+   both cases; they should stay identical.
 
 ## Related documents
 

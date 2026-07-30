@@ -17,6 +17,7 @@
     },
     "body": {
         "message": "The amount field must be an integer. (and 1 more error)",
+        "code": "VALIDATION_FAILED",
         "errors": {
             "amount": [
                 "The amount field must be an integer."
