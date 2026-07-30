@@ -750,7 +750,7 @@ exceptions, and **releases** the job for `retryAfter` seconds on
 
 | Command | Writes remotely? | Notes |
 |---|---|---|
-| `lnkflow:install {--preset=}` | no | publishes config + migrations, rewrites the `features` block |
+| `lnkflow:install {--preset=}` | no | publishes config + content mapping migrations, rewrites the `features` block; non-content integrations can publish only the `lnkflow-config` tag |
 | `lnkflow:doctor` | no | configuration checks plus one `GET /me` |
 | `lnkflow:sync {--dry-run} {--model=} {--id=} {--chunk=} {--force}` | yes, unless `--dry-run` | `--dry-run` still calls `POST /links/preview`, so it needs a write token |
 | `lnkflow:verify --test-conversion [--force]` | **yes** | creates a retained, labelled test conversion and reads it back |
