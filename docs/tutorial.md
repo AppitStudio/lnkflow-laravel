@@ -28,12 +28,19 @@ In your own application:
 
 ```bash
 composer require lnkflow/laravel
-php artisan lnkflow:install --preset=client
-php artisan migrate
+php artisan vendor:publish \
+    --provider="LnkFlow\Laravel\LnkFlowServiceProvider" \
+    --tag=lnkflow-config
 ```
 
-`--preset=client` publishes `config/lnkflow.php` and the mapping migrations and
-enables no feature flags. Direct client calls never need one.
+This tutorial uses direct client calls, journeys, and conversions. Their records
+live in LnkFlow, so they require no package-owned database tables. The mapping
+migrations are only for content synchronization. Direct client calls also need
+no feature flag.
+
+In `0.1.0-beta.1`, `lnkflow:install --preset=client` publishes those content
+mapping migrations as an installer convenience. Prefer the config-only command
+above for this integration scope.
 
 To follow along in the workbench instead, clone this package and install its
 dependencies:

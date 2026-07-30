@@ -1,8 +1,9 @@
 # Troubleshooting and production hardening
 
 Start with `php artisan lnkflow:doctor`. It is read-only and checks the API URL
-and TLS, token presence, team, mapping migrations, the consent binding, queue
-and session configuration, Cashier selection, and `GET /me` connectivity.
+and TLS, token presence, team, the consent binding, queue and session
+configuration, Cashier selection, and `GET /me` connectivity. It checks mapping
+migrations only when content synchronization is enabled.
 
 For the exception classes and their properties, see [Errors](errors.md). For
 which token a call needs, see [Token scopes](token-scopes.md).

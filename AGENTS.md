@@ -10,6 +10,15 @@ This repository is a Laravel package. Keep the package focused, idiomatic, and e
 - Prefer explicit Laravel package code over helper abstractions unless the extension point is real.
 - Keep tests focused on observable package behavior through public APIs, service provider wiring, commands, routes, published resources, and documentation promises.
 
+## Host Integration Database Scope
+
+- Decide which SDK features the host application needs before publishing package migrations.
+- API client, link management, journey capture, identity, and conversion reporting store their LnkFlow data remotely and require no package-owned database tables. Publish only `lnkflow-config` for these integrations.
+- Publish and run `lnkflow-migrations` only when `features.content` is enabled. The two mapping tables belong exclusively to `ContentSynchronizer`.
+- In the `0.1.0-beta.1` line, `lnkflow:install` publishes mapping migrations for every preset as a convenience behavior. For an integration without content synchronization, prefer config-only publishing; if the installer was already run, remove its uncommitted LnkFlow mapping migrations before migrating.
+- Never add duplicate journey, conversion, token, or event tables to a host application. Journey and conversion records live in LnkFlow; the host should reuse its existing session and queue infrastructure.
+- Package mapping tables never store API tokens. Tokens remain environment configuration and must not be committed.
+
 ## Quick Commands
 
 - Full validation: `composer test`

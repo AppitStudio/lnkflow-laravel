@@ -106,6 +106,16 @@ Set them only when the host application is genuinely the owner of that state.
 
 ## Mapping tables
 
+Content synchronization is the only SDK feature that requires package-owned
+database tables. Publish and migrate them when enabling `features.content`:
+
+```bash
+php artisan vendor:publish \
+    --provider="LnkFlow\Laravel\LnkFlowServiceProvider" \
+    --tag=lnkflow-migrations
+php artisan migrate
+```
+
 Two published tables persist the join: `lnkflow_campaign_mappings` and
 `lnkflow_link_mappings`. They hold the connection, remote team id, remote ids,
 the payload hash, the stable idempotency key, `state`
@@ -115,6 +125,9 @@ diagnostics (`last_error_code`, `last_request_id`, a truncated
 
 They never hold a token, a payload, or customer data. Neither do the queued
 jobs — every job carries identifiers and resolves a client in `handle()`.
+
+Do not publish these migrations for client-only, links, journeys, identity, or
+conversion integrations. Those records live remotely in LnkFlow.
 
 ## Commands
 

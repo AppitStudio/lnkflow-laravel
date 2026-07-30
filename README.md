@@ -39,15 +39,33 @@ This package is currently in public beta. Pin the beta explicitly while the
 
 ```bash
 composer require lnkflow/laravel:0.1.0-beta.1
-php artisan lnkflow:install --preset=client
-php artisan migrate
+php artisan vendor:publish \
+    --provider="LnkFlow\Laravel\LnkFlowServiceProvider" \
+    --tag=lnkflow-config
 php artisan lnkflow:doctor
 ```
 
 Presets are `client`, `links`, `content`, `journeys`, `conversions`, and
-`full`. Installation publishes configuration and the mapping migrations, never
-writes a secret, and never enables Cashier. `client` and `links` enable no
-feature flags at all — direct client calls never need one.
+`full`. API client, link, journey, identity, and conversion integrations keep
+their LnkFlow records remotely and require no package-owned database tables.
+They should publish configuration only, as above. The host continues to use its
+existing session and queue infrastructure.
+
+Content synchronization is the exception. It requires two local mapping tables,
+so content integrations should run:
+
+```bash
+php artisan lnkflow:install --preset=content
+php artisan migrate
+```
+
+In `0.1.0-beta.1`, `lnkflow:install` publishes the content mapping migrations
+for every preset. This is installer behavior, not a database requirement. If
+you use the installer for a non-content integration, remove the newly published
+LnkFlow mapping migrations before running `php artisan migrate`.
+
+Installation never writes a secret and never enables Cashier. `client` and
+`links` enable no feature flags at all — direct client calls never need one.
 
 Configure the smallest token scope the application needs:
 
