@@ -190,17 +190,22 @@ expect(fn () => $client->campaigns()->create($payload))
     ->and($exception->requestId)->toBe($fixture['headers']['x-lnkflow-request-id']);
 ```
 
-**npm MCP installer / stdio adapter** (`integrations/lnkflow-mcp-server`) — vendor
-or submodule the directory and feed it to a `fetch` mock; iterate `index.json` so
-a newly recorded status fails the suite until it is mapped.
+**npm MCP installer / stdio adapter** (`integrations/lnkflow-mcp-server`) — reads
+this directory **in place** (`tests/contract-corpus.ts`) and replays each fixture
+through a local HTTP server in `tests/contract.test.ts`. It does not vendor a
+copy: it is the one integration tracked inside this repository, so the corpus is
+always three directories up, and a committed copy would be 99 duplicated files in
+one git history guarded against a problem that cannot occur. If it is ever split
+out, vendor it then.
 
 **Hosted MCP server** (`app/Mcp/Servers/LnkFlowServer.php`) — it dispatches
 in-process through `McpApiGateway`, so it does not need a transport fake, but its
 tool-level error mapping should be asserted against the same bodies.
 
-**Chrome extension** (`integrations/lnkflow-browser-extension`) — `popup/api.js`
-has its own status mapping; drive it from these files in the extension's Jest/Vitest
-suite rather than from hand-written JSON.
+**Chrome extension** (`integrations/lnkflow-browser-extension`) — vendors a
+verbatim copy at `tests/fixtures/contract/` and drives every recorded failure
+through the real `popup/api.js` in `tests/contract.spec.cjs`, which also compares
+the copy byte for byte against this directory whenever this checkout is present.
 
 For all four, the rule from `docs/integrations/conformance-checklist.md` §3 holds:
 one fixture per error class, asserting the exception **type**, `status`, `errors`,
