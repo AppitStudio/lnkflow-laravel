@@ -10,6 +10,7 @@ use LnkFlow\Laravel\Data\CreateWebsite;
 use LnkFlow\Laravel\Data\EnrichedPayload;
 use LnkFlow\Laravel\Data\Lead;
 use LnkFlow\Laravel\Data\NamedEvent;
+use LnkFlow\Laravel\Data\PermissionBasis;
 use LnkFlow\Laravel\Data\Refund;
 use LnkFlow\Laravel\Data\Sale;
 use LnkFlow\Laravel\Data\SocialPlatform;
@@ -128,6 +129,8 @@ it('round-trips consent through its array form', function (): void {
         'ad_personalization' => 'not-a-state',
         'revision' => 3,
         'evidence_id' => 'cmp-42',
+        'permission_basis' => 'regional_default',
+        'policy_revision' => 7,
     ]);
 
     expect($consent->storage)->toBe(ConsentState::Granted)
@@ -136,7 +139,18 @@ it('round-trips consent through its array form', function (): void {
         ->and($consent->adPersonalization)->toBe(ConsentState::Unknown)
         ->and($consent->granted())->toBeTrue()
         ->and($consent->toArray()['revision'])->toBe(3)
-        ->and($consent->toArray()['evidence_id'])->toBe('cmp-42');
+        ->and($consent->toArray()['evidence_id'])->toBe('cmp-42')
+        ->and($consent->permissionBasis)->toBe(PermissionBasis::RegionalDefault)
+        ->and($consent->policyRevision)->toBe(7);
+});
+
+it('does not treat a denied permission basis as granted processing', function (): void {
+    $consent = new Consent(
+        storage: ConsentState::Granted,
+        permissionBasis: PermissionBasis::Denied,
+    );
+
+    expect($consent->granted())->toBeFalse();
 });
 
 it('always attaches consent to a touchpoint', function (): void {

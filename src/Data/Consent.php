@@ -21,6 +21,8 @@ final readonly class Consent implements Payload
         public ConsentState $adPersonalization = ConsentState::Unknown,
         public ?int $revision = null,
         public ?string $evidenceId = null,
+        public ?PermissionBasis $permissionBasis = null,
+        public ?int $policyRevision = null,
     ) {}
 
     /** @param array<string, mixed> $raw */
@@ -32,12 +34,17 @@ final readonly class Consent implements Payload
             self::state($raw['ad_personalization'] ?? null),
             is_numeric($raw['revision'] ?? null) ? (int) $raw['revision'] : null,
             is_string($raw['evidence_id'] ?? null) ? $raw['evidence_id'] : null,
+            is_string($raw['permission_basis'] ?? null)
+                ? PermissionBasis::tryFrom($raw['permission_basis'])
+                : null,
+            is_numeric($raw['policy_revision'] ?? null) ? (int) $raw['policy_revision'] : null,
         );
     }
 
     public function granted(): bool
     {
-        return $this->storage === ConsentState::Granted;
+        return $this->storage === ConsentState::Granted
+            && $this->permissionBasis !== PermissionBasis::Denied;
     }
 
     public function toArray(): array
@@ -48,6 +55,8 @@ final readonly class Consent implements Payload
             'ad_personalization' => $this->adPersonalization->value,
             'revision' => $this->revision,
             'evidence_id' => $this->evidenceId,
+            'permission_basis' => $this->permissionBasis?->value,
+            'policy_revision' => $this->policyRevision,
         ], static fn (mixed $value): bool => $value !== null);
     }
 
